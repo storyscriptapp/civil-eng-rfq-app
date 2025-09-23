@@ -1,2 +1,7 @@
-# civil-eng-rfq-app
-App for civil engineers to scrape and notify on RFQs/RFPs from AZ municipalities
+# Civil Eng RFQ App
+App for scraping municipal RFQs/RFPs and sending notifications to civil engineers.
+
+## Setup
+- Backend: Python + Scrapy
+- Frontend: React PWA
+- DB: SQLite
