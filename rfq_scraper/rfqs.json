@@ -1,11 +1,52 @@
 [
-
-][
-
-][
-
-][
-
-][
-
+    {
+        "organization": "City of Gilbert",
+        "rfp_number": "326000025",
+        "title": "Urban Lakes Renovation / Irrigation System Replacement (CMAR)",
+        "work_type": "utility/transportation",
+        "open_date": "2025-09-24",
+        "due_date": "10/09/2025 3:00 PM",
+        "status": "Open",
+        "link": "https://www.gilbertaz.gov/Home/Components/RFP/RFP/2048/1140"
+    },
+    {
+        "organization": "City of Gilbert",
+        "rfp_number": "326000038",
+        "title": "Landscaping Maintenance Services for PKIDs",
+        "work_type": "maintenance",
+        "open_date": "2025-09-24",
+        "due_date": "10/01/2025 2:00 PM",
+        "status": "Open",
+        "link": "https://www.gilbertaz.gov/Home/Components/RFP/RFP/2050/1140"
+    },
+    {
+        "organization": "City of Gilbert",
+        "rfp_number": "325000255",
+        "title": "Prosecutor's Record Management System (RMS)",
+        "work_type": "unknown",
+        "open_date": "2025-09-24",
+        "due_date": "10/01/2025 10:00 AM",
+        "status": "Open",
+        "link": "https://www.gilbertaz.gov/Home/Components/RFP/RFP/2046/1140"
+    },
+    {
+        "organization": "City of Gilbert",
+        "rfp_number": "326000075",
+        "title": "Water Tower Way, Core Phase",
+        "work_type": "unknown",
+        "open_date": "2025-09-24",
+        "due_date": "09/30/2025 12:00 PM",
+        "status": "Open",
+        "link": "https://www.gilbertaz.gov/Home/Components/RFP/RFP/2044/1140"
+    },
+    {
+        "organization": "City of Gilbert",
+        "rfp_number": "326000061",
+        "title": "San Tan Vista Trail Improvements Phase 4 - POSTPONED",
+        "work_type": "unknown",
+        "open_date": "2025-09-24",
+        "due_date": "09/29/2025 12:00 PM",
+        "status": "Open",
+        "link": "https://www.gilbertaz.gov/Home/Components/RFP/RFP/2042/1140"
+    }
 ]
