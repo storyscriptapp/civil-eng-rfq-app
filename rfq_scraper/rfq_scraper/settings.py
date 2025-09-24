@@ -22,5 +22,6 @@ DOWNLOADER_MIDDLEWARES = {
     "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler": 800,
 }
 PLAYWRIGHT_BROWSER_TYPE = "chromium"
-PLAYWRIGHT_HEADLESS = True
+PLAYWRIGHT_HEADLESS = False
 PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT = 60000
+# HTTP_PROXY = "http://your-proxy-ip:port"

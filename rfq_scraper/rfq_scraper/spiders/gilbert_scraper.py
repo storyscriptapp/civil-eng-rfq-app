@@ -15,10 +15,17 @@ class GilbertScraperSpider(scrapy.Spider):
     async def start(self):
         for url in self.start_urls:
             yield scrapy.Request(
-                url,
-                meta={"playwright": True, "playwright_include_page": True},
-                callback=self.parse,
-            )
+    url,
+    meta={
+        "playwright": True,
+        "playwright_include_page": True,
+        "playwright_context_args": {
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+            "viewport": {"width": 1280, "height": 800},
+        },
+    },
+    callback=self.parse,
+)
 
     async def parse(self, response):
         for row in response.css("table tbody tr"):
