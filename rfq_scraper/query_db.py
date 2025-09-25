@@ -11,7 +11,7 @@ print(f"Utility/Transportation RFQs: {len(results)}")
 for row in results[:2]:
     print(row)
 
-cursor.execute("UPDATE rfqs SET completed = 1 WHERE rfp_number = ?", ("CP1254BR01",))
+cursor.execute("UPDATE rfqs SET completed = 1 WHERE rfp_number = ?", ("CP1254BR01(PDF, 312KB)",))
 conn.commit()
 
 conn.close()

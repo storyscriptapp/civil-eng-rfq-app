@@ -36,33 +36,40 @@ for site in sites:
     if manual:
         print(f"Scraping {org} (manual CAPTCHA required)...")
         input(f"Press Enter after resolving CAPTCHA for {org} or skip...")
-        time.sleep(2)  # Wait for manual resolution
+        time.sleep(2)
     else:
         print(f"Scraping {org}...")
 
     try:
         driver.get(url)
-        wait = WebDriverWait(driver, 10)
+        wait = WebDriverWait(driver, 15)  # Increased timeout
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, row_selector)))
         rows = driver.find_elements(By.CSS_SELECTOR, row_selector)
 
         for row in rows:
-            cells = row.find_elements(By.TAG_NAME, "td") or row.find_elements(By.CSS_SELECTOR, ".opportunity-cell")
+            cells = row.find_elements(By.TAG_NAME, "td")
             if len(cells) < cell_count:
                 continue
 
-            title_elem = cells[0].find_element(By.TAG_NAME, "a")
-            title = title_elem.text.strip().split('\n')[0]
-            link = title_elem.get_attribute("href")
-            if not link.startswith("http"):
-                link = url.rsplit('/', 1)[0] + '/' + link
+            try:
+                title_elem = cells[0].find_element(By.TAG_NAME, "a")
+                title = title_elem.text.strip().split('\n')[0]
+                link = title_elem.get_attribute("href")
+                if not link.startswith("http"):
+                    link = url.rsplit('/', 1)[0] + '/' + link
+            except:
+                continue  # Skip rows without a link
 
             if org == "City of Mesa":
                 rfp_number = cells[0].text.strip().split('\n')[1].replace("Project No. ", "") if '\n' in cells[0].text else ""
                 due_date = cells[1].text.strip()
                 documents = cells[2].text.strip().split('\n') if cell_count > 2 else []
+            elif org == "City of Gilbert":
+                rfp_number = cells[0].text.strip()
+                due_date = cells[2].text.strip()
+                documents = []
             elif org == "City of Apache Junction":
-                rfp_number = cells[1].text.strip()  # Adjust based on table structure
+                rfp_number = cells[1].text.strip()
                 due_date = cells[2].text.strip()
                 documents = []
             else:

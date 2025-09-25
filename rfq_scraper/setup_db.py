@@ -8,6 +8,7 @@ conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
 # Create table
+cursor.execute("DROP TABLE IF EXISTS rfqs")  # Clear any corrupted table
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS rfqs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,13 +26,11 @@ CREATE TABLE IF NOT EXISTS rfqs (
 )
 """)
 
-# Clear existing data
-cursor.execute("DELETE FROM rfqs")
-
 # Insert data from rfqs.json
 with open(os.path.join(os.path.dirname(__file__), "rfqs.json"), "r") as f:
     data = json.load(f)
 
+cursor.execute("DELETE FROM rfqs")  # Ensure no duplicates
 for item in data:
     cursor.execute("""
     INSERT INTO rfqs (organization, rfp_number, title, work_type, open_date, due_date, status, link, documents)
