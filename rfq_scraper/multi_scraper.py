@@ -5,6 +5,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import json
 from datetime import date
+import time
+
+# Load cities
+with open("cities.json", "r") as f:
+    sites = json.load(f)
 
 options = Options()
 options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36")
@@ -13,24 +18,29 @@ options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-blink-features=AutomationControlled")
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option('useAutomationExtension', False)
-options.headless = False  # Set to True for production
+options.headless = False
 
 driver = webdriver.Chrome(options=options)
 driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
 data = []
-sites = [
-    ("City of Mesa", "https://www.mesaaz.gov/Business-Development/Engineering/Architectural-Engineering-Design-Opportunities", "table tbody tr", 3, True),
-    ("City of Yuma", "https://yumaaz.bonfirehub.com/portal/?tab=openOpportunities", ".opportunity-item", 4, True),  # BonfireHub selector
-    ("City of Apache Junction", "https://www.apachejunctionaz.gov/826/Current-Solicitations", "table tbody tr", 4, False),  # Static table
-    ("Pinal County", "https://pinalcountyaz.bonfirehub.com/portal/?tab=openOpportunities", ".opportunity-item", 4, True),  # BonfireHub
-    ("Town of Florence", "https://procurement.opengov.com/portal/florenceaz", ".opportunity-row", 4, True),  # OpenGov
-    ("Town of Queen Creek", "https://procurement.opengov.com/portal/queencreekaz", ".opportunity-row", 4, True),  # OpenGov
-]
 
-for org, url, row_selector, cell_count, is_dynamic in sites:
-    try:
+for site in sites:
+    org = site["organization"]
+    url = site["url"]
+    row_selector = site["row_selector"]
+    cell_count = site["cell_count"]
+    is_dynamic = site["is_dynamic"]
+    manual = site.get("manual", False)
+
+    if manual:
+        print(f"Scraping {org} (manual CAPTCHA required)...")
+        input(f"Press Enter after resolving CAPTCHA for {org} or skip...")
+        time.sleep(2)  # Wait for manual resolution
+    else:
         print(f"Scraping {org}...")
+
+    try:
         driver.get(url)
         wait = WebDriverWait(driver, 10)
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, row_selector)))
@@ -42,14 +52,25 @@ for org, url, row_selector, cell_count, is_dynamic in sites:
                 continue
 
             title_elem = cells[0].find_element(By.TAG_NAME, "a")
-            title = title_elem.text.strip()
+            title = title_elem.text.strip().split('\n')[0]
             link = title_elem.get_attribute("href")
             if not link.startswith("http"):
-                link = url + link
-            rfp_number = cells[1].text.strip() if cell_count > 1 else ""
-            due_date = cells[2].text.strip()
-            status = cells[3].text.strip() if cell_count > 3 else "Open"
+                link = url.rsplit('/', 1)[0] + '/' + link
 
+            if org == "City of Mesa":
+                rfp_number = cells[0].text.strip().split('\n')[1].replace("Project No. ", "") if '\n' in cells[0].text else ""
+                due_date = cells[1].text.strip()
+                documents = cells[2].text.strip().split('\n') if cell_count > 2 else []
+            elif org == "City of Apache Junction":
+                rfp_number = cells[1].text.strip()  # Adjust based on table structure
+                due_date = cells[2].text.strip()
+                documents = []
+            else:
+                rfp_number = cells[1].text.strip() if cell_count > 1 else ""
+                due_date = cells[2].text.strip()
+                documents = []
+
+            status = cells[3].text.strip() if cell_count > 3 else "Open"
             if status != "Open":
                 continue
 
@@ -70,6 +91,7 @@ for org, url, row_selector, cell_count, is_dynamic in sites:
                 "due_date": due_date,
                 "status": status,
                 "link": link,
+                "documents": documents
             })
 
     except Exception as e:

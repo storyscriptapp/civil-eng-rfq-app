@@ -1,0 +1,58 @@
+[
+    {
+        "organization": "City of Gilbert",
+        "url": "https://www.gilbertaz.gov/how-do-i/view/rfp-cip-open-bids",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": false,
+        "manual": false
+    },
+    {
+        "organization": "City of Mesa",
+        "url": "https://www.mesaaz.gov/Business-Development/Engineering/Architectural-Engineering-Design-Opportunities",
+        "row_selector": "table tbody tr",
+        "cell_count": 3,
+        "is_dynamic": false,
+        "manual": false
+    },
+    {
+        "organization": "City of Apache Junction",
+        "url": "https://www.apachejunctionaz.gov/826/Current-Solicitations",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": false,
+        "manual": false
+    },
+    {
+        "organization": "City of Yuma",
+        "url": "https://yumaaz.bonfirehub.com/portal/?tab=openOpportunities",
+        "row_selector": ".opportunity-item",
+        "cell_count": 4,
+        "is_dynamic": true,
+        "manual": true
+    },
+    {
+        "organization": "Pinal County",
+        "url": "https://pinalcountyaz.bonfirehub.com/portal/?tab=openOpportunities",
+        "row_selector": ".opportunity-item",
+        "cell_count": 4,
+        "is_dynamic": true,
+        "manual": true
+    },
+    {
+        "organization": "Town of Florence",
+        "url": "https://procurement.opengov.com/portal/florenceaz",
+        "row_selector": ".opportunity-row",
+        "cell_count": 4,
+        "is_dynamic": true,
+        "manual": true
+    },
+    {
+        "organization": "Town of Queen Creek",
+        "url": "https://procurement.opengov.com/portal/queencreekaz",
+        "row_selector": ".opportunity-row",
+        "cell_count": 4,
+        "is_dynamic": true,
+        "manual": true
+    }
+]
