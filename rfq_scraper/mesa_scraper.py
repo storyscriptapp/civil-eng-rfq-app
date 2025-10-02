@@ -13,7 +13,7 @@ options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-blink-features=AutomationControlled")
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option('useAutomationExtension', False)
-options.headless = False  # Set to True for production
+options.headless = False
 
 driver = webdriver.Chrome(options=options)
 driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
@@ -31,13 +31,14 @@ try:
             continue
 
         title_elem = cells[0].find_element(By.TAG_NAME, "a")
-        title = title_elem.text.strip()
+        title = title_elem.text.strip().split('\n')[0]  # Remove "Project No." suffix
         link = title_elem.get_attribute("href")
         if not link.startswith("http"):
             link = "https://www.mesaaz.gov" + link
-        bid_number = cells[1].text.strip()
-        due_date = cells[2].text.strip()
-        status = "Open"  # Mesa page lists open RFQs
+        due_date = cells[1].text.strip()  # Correct: Due Date is second column
+        rfp_number = cells[0].text.strip().split('\n')[1].replace("Project No. ", "")  # Extract project number
+        status = "Open"  # Mesa lists open RFQs
+        documents = cells[2].text.strip().split('\n')  # Capture related documents
 
         title_lower = title.lower()
         work_type = "unknown"
@@ -49,13 +50,14 @@ try:
         open_date = date.today().strftime("%Y-%m-%d")
         data.append({
             "organization": "City of Mesa",
-            "rfp_number": bid_number,
+            "rfp_number": rfp_number,
             "title": title,
             "work_type": work_type,
             "open_date": open_date,
             "due_date": due_date,
             "status": status,
             "link": link,
+            "documents": documents  # Add related documents
         })
 
     with open("rfqs.json", "w") as f:

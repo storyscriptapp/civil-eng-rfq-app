@@ -11,7 +11,6 @@ from PIL import Image
 import pytesseract
 import cv2
 import re
-import numpy as np
 
 # Set Tesseract path
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -86,27 +85,11 @@ for site in sites:
             except:
                 continue
 
-            if org == "City of Mesa":
-                rfp_number = cells[0].text.strip().split('\n')[1].replace("Project No. ", "") if '\n' in cells[0].text else ""
-                due_date = cells[1].text.strip()
-                documents = cells[2].text.strip().split('\n') if cell_count > 2 else []
-            elif org == "City of Gilbert":
-                rfp_number = cells[0].text.strip()
-                due_date = cells[2].text.strip()
-                documents = []
-            elif org == "Pinal County":
-                if "no open bid postings" in row.text.lower():
-                    print(f"No open RFQs for {org}")
-                    continue
-                rfp_number = cells[0].text.strip()
-                due_date = cells[0].text.strip()
-                documents = []
-            else:
-                rfp_number = cells[1].text.strip() if cell_count > 1 else ""
-                due_date = cells[2].text.strip() if cell_count > 2 else ""
-                documents = []
-
+            rfp_number = cells[0].text.strip().split('\n')[1].replace("Project No. ", "") if '\n' in cells[0].text else cells[1].text.strip()
+            due_date = cells[1].text.strip() if org == "City of Mesa" else cells[2].text.strip()
+            documents = cells[2].text.strip().split('\n') if org == "City of Mesa" and cell_count > 2 else []
             status = cells[3].text.strip() if cell_count > 3 else "Open"
+
             if status != "Open":
                 continue
 
@@ -130,8 +113,14 @@ for site in sites:
                 "documents": documents
             })
 
+        # Pause after Gilbert
+        if org == "City of Gilbert":
+            print("Paused after Gilbert. Data so far:")
+            print(json.dumps(data, indent=4))
+            input("Press Enter to continue...")
     except Exception as e:
         print(f"{org} Error: {e}")
+        # OCR fallback
         screenshot_path = os.path.join(os.path.dirname(__file__), f"{org.lower().replace(' ', '_')}_screenshot.png")
         try:
             driver.set_window_size(1920, 1080)
@@ -148,19 +137,10 @@ for site in sites:
                 print(f"Failed to load screenshot: {screenshot_path}")
                 continue
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            edges = cv2.Canny(gray, 50, 150, apertureSize=3)
-            contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            if contours:
-                largest_contour = max(contours, key=cv2.contourArea)
-                x, y, w, h = cv2.boundingRect(largest_contour)
-                table_img = img[y:y+h, x:x+w]
-                cv2.imwrite(screenshot_path, table_img)
-                print("Cropped to table contour")
-            else:
-                print("No table contour found")
+            gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+            cv2.imwrite(screenshot_path, gray)
             text = pytesseract.image_to_string(Image.open(screenshot_path))
             print(f"OCR extracted text for {org}: {text[:200]}...")
-
             # Parse OCR text
             rfq_pattern = re.compile(r"(RFP\s*#[^\s]+)\s*-\s*(.*?)(?=\n|$)", re.MULTILINE)
             matches = rfq_pattern.findall(text)

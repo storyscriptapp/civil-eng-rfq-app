@@ -9,4 +9,8 @@ import scrapy
 class RfqScraperItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
+    title = scrapy.Field()
+    work_type = scrapy.Field()
+    open_date = scrapy.Field()
+    due_date = scrapy.Field()
+    details_link = scrapy.Field()

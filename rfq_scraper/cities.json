@@ -18,9 +18,9 @@
     {
         "organization": "City of Apache Junction",
         "url": "https://www.apachejunctionaz.gov/826/Current-Solicitations",
-        "row_selector": "table tbody tr",
-        "cell_count": 4,
-        "is_dynamic": false,
+        "row_selector": "table.tabHome tbody tr",
+        "cell_count": 5,
+        "is_dynamic": true,
         "manual": false
     },
     {
