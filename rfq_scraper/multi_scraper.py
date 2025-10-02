@@ -90,9 +90,6 @@ for site in sites:
             documents = cells[2].text.strip().split('\n') if org == "City of Mesa" and cell_count > 2 else []
             status = cells[3].text.strip() if cell_count > 3 else "Open"
 
-            if status != "Open":
-                continue
-
             title_lower = title.lower()
             work_type = "unknown"
             if any(word in title_lower for word in ["utility", "irrigation", "sewer", "transportation", "road", "bridge", "hydraulics", "storm drain"]):
