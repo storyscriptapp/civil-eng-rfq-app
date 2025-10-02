@@ -10,6 +10,7 @@ from PIL import Image
 import pytesseract
 import cv2
 import numpy as np
+from job_tracking import RFQJobTracker
 
 app = FastAPI()
 
@@ -23,16 +24,16 @@ app.add_middleware(
 
 @app.get("/rfqs")
 async def get_rfqs():
-    db_path = os.path.join(os.path.dirname(__file__), "rfqs.db")
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    cursor.execute("""
-    SELECT r.id, o.name, r.rfp_number, r.title, r.work_type, r.open_date, r.due_date, r.status, r.link, r.scraped_at
-    FROM rfqs r JOIN organizations o ON r.organization_id = o.id
-    """)
-    rfqs = cursor.fetchall()
-    conn.close()
-    return [{"id": r[0], "organization": r[1], "rfp_number": r[2], "title": r[3], "work_type": r[4], "open_date": r[5], "due_date": r[6], "status": r[7], "link": r[8], "scraped_at": r[9]} for r in rfqs]
+    # Read from rfqs.json (new format with job tracking)
+    rfqs_path = os.path.join(os.path.dirname(__file__), "rfqs.json")
+    try:
+        with open(rfqs_path, 'r') as f:
+            rfqs = json.load(f)
+        return rfqs
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        return []
 
 @app.post("/run_scraper")
 async def run_scraper():
@@ -44,6 +45,41 @@ async def save_cities(cities: list):
     with open(os.path.join(os.path.dirname(__file__), "cities.json"), "w") as f:
         json.dump(cities, f, indent=4)
     return {"status": "Cities saved"}
+
+@app.post("/update_job_status")
+async def update_job_status(data: dict):
+    job_id = data.get("job_id")
+    status = data.get("status")
+    notes = data.get("notes")
+    
+    if not job_id or not status:
+        return {"error": "Missing job_id or status"}
+    
+    # Update in tracking database
+    tracker = RFQJobTracker()
+    tracker.update_user_decision(job_id, status, notes)
+    
+    # Also update in rfqs.json for immediate UI response
+    rfqs_path = os.path.join(os.path.dirname(__file__), "rfqs.json")
+    try:
+        with open(rfqs_path, 'r') as f:
+            rfqs = json.load(f)
+        
+        # Update the specific job
+        for rfq in rfqs:
+            if rfq.get('job_id') == job_id:
+                rfq['user_status'] = status
+                if notes:
+                    rfq['user_notes'] = notes
+                break
+        
+        # Save back to file
+        with open(rfqs_path, 'w') as f:
+            json.dump(rfqs, f, indent=4)
+        
+        return {"status": "Job status updated", "job_id": job_id, "new_status": status}
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.post("/parse_text")
 async def parse_text(data: dict):

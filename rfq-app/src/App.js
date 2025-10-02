@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
 
 function App() {
     const [rfqs, setRfqs] = useState([]);
@@ -8,6 +9,15 @@ function App() {
     const [pasteText, setPasteText] = useState('');
     const [screenshot, setScreenshot] = useState(null);
     const [screenshotOrg, setScreenshotOrg] = useState('');
+    
+    // Filter states
+    const [filters, setFilters] = useState({
+        workType: 'all',
+        userStatus: 'all',
+        organization: 'all',
+        searchTerm: '',
+        hideIgnored: true  // Hide ignored by default
+    });
 
     useEffect(() => {
         fetch('http://localhost:8000/rfqs')
@@ -72,46 +82,299 @@ function App() {
             .catch(err => console.error('Error uploading screenshot:', err));
     };
 
+    const updateUserStatus = (jobId, status, notes = null) => {
+        fetch('http://localhost:8000/update_job_status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ job_id: jobId, status, notes })
+        })
+            .then(res => res.json())
+            .then(data => {
+                // Update local state
+                setRfqs(rfqs.map(rfq => 
+                    rfq.job_id === jobId ? { ...rfq, user_status: status, user_notes: notes } : rfq
+                ));
+                console.log('Updated job status:', data);
+            })
+            .catch(err => console.error('Error updating job status:', err));
+    };
+
+    // Apply filters
+    const filteredRfqs = rfqs.filter(rfq => {
+        // Filter by work type
+        if (filters.workType !== 'all' && rfq.work_type !== filters.workType) return false;
+        
+        // Filter by user status
+        if (filters.userStatus !== 'all' && rfq.user_status !== filters.userStatus) return false;
+        
+        // Filter by organization
+        if (filters.organization !== 'all' && rfq.organization !== filters.organization) return false;
+        
+        // Hide ignored jobs (if checked)
+        if (filters.hideIgnored && rfq.user_status === 'ignore') return false;
+        
+        // Filter by search term
+        if (filters.searchTerm) {
+            const searchLower = filters.searchTerm.toLowerCase();
+            const matchesSearch = 
+                rfq.title?.toLowerCase().includes(searchLower) ||
+                rfq.rfp_number?.toLowerCase().includes(searchLower) ||
+                rfq.organization?.toLowerCase().includes(searchLower);
+            if (!matchesSearch) return false;
+        }
+        
+        return true;
+    });
+
+    // Get unique organizations for filter dropdown
+    const organizations = [...new Set(rfqs.map(rfq => rfq.organization))].sort();
+
     return (
-        <div className="container">
-            <h1>RFQ App</h1>
-            <h2>RFQs</h2>
-            <table className="table">
-                <thead>
-                    <tr>
-                        <th>Organization</th>
-                        <th>Title</th>
-                        <th>Work Type</th>
-                        <th>Due Date</th>
-                        <th>Completed</th>
-                        <th>Hide</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rfqs.map((rfq, index) => (
-                        <tr key={index}>
-                            <td>{rfq.organization}</td>
-                            <td><a href={rfq.link || '#'} target="_blank" rel="noopener noreferrer">{rfq.title}</a></td>
-                            <td>{rfq.work_type}</td>
-                            <td>{rfq.due_date}</td>
-                            <td><input type="checkbox" checked={rfq.completed} onChange={() => {}} /></td>
-                            <td><input type="checkbox" checked={rfq.hide} onChange={() => {}} /></td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <h2>Add City</h2>
-            <input type="text" placeholder="Organization" onChange={e => setNewCity({...newCity, organization: e.target.value})} />
-            <input type="text" placeholder="URL" onChange={e => setNewCity({...newCity, url: e.target.value})} />
-            <button onClick={addCity}>Add City</button>
-            <button onClick={runScraper}>Run Scraper</button>
-            <h2>Manual Input</h2>
-            <input type="text" placeholder="Organization for Manual Input" onChange={e => setScreenshotOrg(e.target.value)} />
-            <textarea placeholder="Paste RFQ text here" value={pasteText} onChange={e => setPasteText(e.target.value)} style={{ width: '100%', height: '100px' }} />
-            <button onClick={parseText}>Parse Text</button>
-            <h2>Upload Screenshot</h2>
-            <input type="file" accept="image/*" onChange={e => setScreenshot(e.target.files[0])} />
-            <button onClick={uploadScreenshot} disabled={!screenshot}>Upload Screenshot</button>
+        <div className="container mt-4">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h1>RFQ Tracker</h1>
+                <button className="btn btn-primary" onClick={runScraper}>
+                    <i className="bi bi-arrow-clockwise"></i> Run Scraper
+                </button>
+            </div>
+
+            {/* Filters */}
+            <div className="card mb-4">
+                <div className="card-body">
+                    <h5 className="card-title">Filters</h5>
+                    <div className="row g-3">
+                        <div className="col-md-3">
+                            <label className="form-label">Search</label>
+                            <input 
+                                type="text" 
+                                className="form-control" 
+                                placeholder="Search title, number, org..."
+                                value={filters.searchTerm}
+                                onChange={e => setFilters({...filters, searchTerm: e.target.value})}
+                            />
+                        </div>
+                        <div className="col-md-2">
+                            <label className="form-label">Work Type</label>
+                            <select 
+                                className="form-select"
+                                value={filters.workType}
+                                onChange={e => setFilters({...filters, workType: e.target.value})}
+                            >
+                                <option value="all">All Types</option>
+                                <option value="utility/transportation">Utility/Transportation</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="unknown">Other</option>
+                            </select>
+                        </div>
+                        <div className="col-md-2">
+                            <label className="form-label">Status</label>
+                            <select 
+                                className="form-select"
+                                value={filters.userStatus}
+                                onChange={e => setFilters({...filters, userStatus: e.target.value})}
+                            >
+                                <option value="all">All Status</option>
+                                <option value="new">New</option>
+                                <option value="pursuing">Pursuing</option>
+                                <option value="completed">Completed</option>
+                                <option value="declined">Declined</option>
+                                <option value="ignore">Ignored</option>
+                            </select>
+                        </div>
+                        <div className="col-md-3">
+                            <label className="form-label">Organization</label>
+                            <select 
+                                className="form-select"
+                                value={filters.organization}
+                                onChange={e => setFilters({...filters, organization: e.target.value})}
+                            >
+                                <option value="all">All Organizations</option>
+                                {organizations.map(org => (
+                                    <option key={org} value={org}>{org}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="col-md-2 d-flex align-items-end">
+                            <div className="form-check">
+                                <input 
+                                    className="form-check-input" 
+                                    type="checkbox" 
+                                    id="hideIgnored"
+                                    checked={filters.hideIgnored}
+                                    onChange={e => setFilters({...filters, hideIgnored: e.target.checked})}
+                                />
+                                <label className="form-check-label" htmlFor="hideIgnored">
+                                    Hide Ignored
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-2">
+                        <span className="text-muted">
+                            Showing {filteredRfqs.length} of {rfqs.length} RFQs
+                        </span>
+                        {filteredRfqs.length !== rfqs.length && (
+                            <button 
+                                className="btn btn-sm btn-link" 
+                                onClick={() => setFilters({workType: 'all', userStatus: 'all', organization: 'all', searchTerm: '', hideIgnored: false})}
+                            >
+                                Clear Filters
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* RFQs Table */}
+            <div className="card">
+                <div className="card-body">
+                    <h5 className="card-title">RFQs</h5>
+                    <div className="table-responsive">
+                        <table className="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Organization</th>
+                                    <th>Title</th>
+                                    <th>Work Type</th>
+                                    <th>Due Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredRfqs.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" className="text-center text-muted">
+                                            No RFQs match your filters
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    filteredRfqs.map((rfq) => (
+                                        <tr key={rfq.job_id || rfq.rfp_number} className={rfq.user_status === 'new' ? 'table-primary' : ''}>
+                                            <td>
+                                                {rfq.user_status === 'new' && <span className="badge bg-success">NEW</span>}
+                                                {rfq.user_status === 'pursuing' && <span className="badge bg-warning">Pursuing</span>}
+                                                {rfq.user_status === 'completed' && <span className="badge bg-info">Completed</span>}
+                                                {rfq.user_status === 'declined' && <span className="badge bg-secondary">Declined</span>}
+                                                {rfq.user_status === 'ignore' && <span className="badge bg-danger">Ignored</span>}
+                                            </td>
+                                            <td><small>{rfq.organization}</small></td>
+                                            <td>
+                                                <a href={rfq.link || '#'} target="_blank" rel="noopener noreferrer">
+                                                    {rfq.title}
+                                                </a>
+                                                <br />
+                                                <small className="text-muted">#{rfq.rfp_number}</small>
+                                            </td>
+                                            <td><span className="badge bg-light text-dark">{rfq.work_type}</span></td>
+                                            <td>{rfq.due_date}</td>
+                                            <td>
+                                                <div className="btn-group btn-group-sm" role="group">
+                                                    <button 
+                                                        className="btn btn-outline-success" 
+                                                        onClick={() => updateUserStatus(rfq.job_id, 'pursuing')}
+                                                        title="Mark as Pursuing"
+                                                    >
+                                                        ✓
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-outline-info" 
+                                                        onClick={() => updateUserStatus(rfq.job_id, 'completed')}
+                                                        title="Mark as Completed"
+                                                    >
+                                                        ✔✔
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-outline-danger" 
+                                                        onClick={() => updateUserStatus(rfq.job_id, 'ignore')}
+                                                        title="Ignore this RFQ"
+                                                    >
+                                                        ✗
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {/* Admin Section - Collapsed by default */}
+            <div className="card mt-4">
+                <div className="card-body">
+                    <details>
+                        <summary className="fw-bold" style={{cursor: 'pointer'}}>
+                            Advanced Options
+                        </summary>
+                        <div className="mt-3">
+                            <h5>Add City</h5>
+                            <div className="row g-2 mb-3">
+                                <div className="col-md-4">
+                                    <input 
+                                        type="text" 
+                                        className="form-control" 
+                                        placeholder="Organization" 
+                                        onChange={e => setNewCity({...newCity, organization: e.target.value})} 
+                                    />
+                                </div>
+                                <div className="col-md-6">
+                                    <input 
+                                        type="text" 
+                                        className="form-control" 
+                                        placeholder="URL" 
+                                        onChange={e => setNewCity({...newCity, url: e.target.value})} 
+                                    />
+                                </div>
+                                <div className="col-md-2">
+                                    <button className="btn btn-primary w-100" onClick={addCity}>Add City</button>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <h5>Manual Input</h5>
+                            <div className="mb-3">
+                                <input 
+                                    type="text" 
+                                    className="form-control mb-2" 
+                                    placeholder="Organization for Manual Input" 
+                                    onChange={e => setScreenshotOrg(e.target.value)} 
+                                />
+                                <textarea 
+                                    className="form-control mb-2" 
+                                    placeholder="Paste RFQ text here" 
+                                    value={pasteText} 
+                                    onChange={e => setPasteText(e.target.value)} 
+                                    rows="4"
+                                />
+                                <button className="btn btn-secondary" onClick={parseText}>Parse Text</button>
+                            </div>
+
+                            <hr />
+
+                            <h5>Upload Screenshot</h5>
+                            <div className="mb-3">
+                                <input 
+                                    type="file" 
+                                    className="form-control mb-2" 
+                                    accept="image/*" 
+                                    onChange={e => setScreenshot(e.target.files[0])} 
+                                />
+                                <button 
+                                    className="btn btn-secondary" 
+                                    onClick={uploadScreenshot} 
+                                    disabled={!screenshot}
+                                >
+                                    Upload Screenshot
+                                </button>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
         </div>
     );
 }
