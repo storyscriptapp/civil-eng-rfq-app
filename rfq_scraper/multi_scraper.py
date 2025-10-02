@@ -11,6 +11,9 @@ from PIL import Image
 import pytesseract
 import cv2
 import re
+from scraper_health import ScraperHealthMonitor
+from scraper_strategies import ScraperStrategy
+from job_tracking import RFQJobTracker
 
 # Set Tesseract path
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -18,6 +21,11 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 # Load cities
 with open("cities.json", "r") as f:
     sites = json.load(f)
+
+# Initialize health monitor and job tracker
+health_monitor = ScraperHealthMonitor()
+job_tracker = RFQJobTracker()
+cities_config_updated = False  # Track if we need to save cities.json
 
 options = Options()
 options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36")
@@ -28,19 +36,33 @@ options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option('useAutomationExtension', False)
 options.headless = False
 options.add_argument("--window-size=1920,1080")
+options.add_argument("--disable-gpu")
+options.add_argument("--disable-software-rasterizer")
 
-driver = webdriver.Chrome(options=options)
-driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+def create_driver():
+    """Create a new Chrome driver instance"""
+    driver = webdriver.Chrome(options=options)
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    return driver
+
+driver = create_driver()
 
 data = []
 
-for site in sites:
+for site_idx, site in enumerate(sites):
     org = site["organization"]
     url = site["url"]
     row_selector = site["row_selector"]
     cell_count = site["cell_count"]
     is_dynamic = site["is_dynamic"]
     manual = site.get("manual", False)
+    has_pagination = site.get("has_pagination", False)
+    pagination_selector = site.get("pagination_selector", "")
+    skip_wait = site.get("skip_wait", False)
+    
+    rfq_count_for_city = 0
+    strategy_used = None
+    scrape_error = None
 
     if manual:
         print(f"Scraping {org} (manual CAPTCHA required)...")
@@ -48,75 +70,260 @@ for site in sites:
         time.sleep(2)
 
     try:
+        # Check if browser is still alive, restart if needed
+        try:
+            driver.current_url  # This will fail if session is dead
+        except:
+            print(f"⚠️ Browser session died, restarting...")
+            try:
+                driver.quit()
+            except:
+                pass
+            driver = create_driver()
+        
         print(f"Scraping {org}...")
         driver.get(url)
-        wait = WebDriverWait(driver, 15)
-
-        # Scroll to table
-        try:
-            table = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, row_selector)))
-            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", table)
-            time.sleep(1)
-        except:
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(1)
+        wait = WebDriverWait(driver, 30)
+        
+        if skip_wait:
+            print(f"Skipping wait for {org}, loading directly...")
+            time.sleep(5)  # Just wait for page to settle
+        else:
+            # Scroll to table
+            try:
+                table = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, row_selector)))
+                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", table)
+                time.sleep(2)
+                print(f"Table found for {org}")
+            except Exception as e:
+                print(f"Table not found for {org}, trying scroll: {e}")
+                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(2)
 
         # Handle iframes
         if is_dynamic:
             try:
                 iframe = wait.until(EC.presence_of_element_located((By.TAG_NAME, "iframe")))
                 driver.switch_to.frame(iframe)
-                print(f"Switched to iframe for {org}")
+                print(f"✅ Switched to iframe for {org}")
+                time.sleep(2)  # Give iframe content time to load
             except:
-                print(f"No iframe found for {org}")
+                print(f"⚠️ No iframe found for {org}, continuing without iframe")
 
-        rows = driver.find_elements(By.CSS_SELECTOR, row_selector)
-        for row in rows:
-            cells = row.find_elements(By.TAG_NAME, "td") or row.find_elements(By.CSS_SELECTOR, ".opportunity-cell") or row.find_elements(By.TAG_NAME, "div")
-            if len(cells) < cell_count:
-                continue
+        # Pagination loop
+        page_num = 1
+        seen_titles = set()  # Track titles to detect duplicates
+        max_pages = 10  # Safety limit
+        
+        while page_num <= max_pages:
+            print(f"Scraping {org} page {page_num}...")
+            time.sleep(1)  # Let page load
+            
+            # Try to find rows using configured selector first
+            rows = driver.find_elements(By.CSS_SELECTOR, row_selector)
+            print(f"Found {len(rows)} rows for {org} using configured selector")
+            
+            # If no rows found, try multi-strategy fallback
+            if len(rows) == 0:
+                print(f"⚠️ No rows with configured selector. Trying fallback strategies...")
+                strategy_result = ScraperStrategy.try_strategies(driver, row_selector)
+                
+                if strategy_result:
+                    rows = strategy_result["rows"]
+                    new_selector = strategy_result["strategy"]["row_selector"]
+                    strategy_used = strategy_result["strategy"]["name"]
+                    
+                    # Update cities.json with working strategy
+                    if new_selector != row_selector:
+                        print(f"📝 Updating {org} config to use '{strategy_used}' strategy")
+                        sites[site_idx]["row_selector"] = new_selector
+                        sites[site_idx]["cell_count"] = strategy_result["cell_count"]
+                        sites[site_idx]["strategy_name"] = strategy_used
+                        row_selector = new_selector  # Use for rest of pagination
+                        cell_count = strategy_result["cell_count"]
+                        cities_config_updated = True
+                else:
+                    print(f"❌ No working strategy found for {org}")
+                    scrape_error = "No working selector strategy found"
+                    break
+            
+            for row in rows:
+                cells = row.find_elements(By.TAG_NAME, "td") or row.find_elements(By.CSS_SELECTOR, ".opportunity-cell") or row.find_elements(By.TAG_NAME, "div")
+                if len(cells) < cell_count:
+                    print(f"Skipping row with {len(cells)} cells (expected {cell_count})")
+                    continue
 
-            try:
-                title_elem = cells[0].find_element(By.TAG_NAME, "a")
-                title = title_elem.text.strip().split('\n')[0]
-                link = title_elem.get_attribute("href")
-                if not link.startswith("http"):
-                    link = url.rsplit('/', 1)[0] + '/' + link
-            except:
-                continue
+                # Try to find link - might be in different cells for different orgs
+                try:
+                    title_elem = None
+                    link = None
+                    title = None
+                    
+                    # Try to find link in any of the first few cells
+                    for i in range(min(len(cells), len(cells))):  # Check all cells
+                        try:
+                            # First try <a> tag
+                            title_elem = cells[i].find_element(By.TAG_NAME, "a")
+                            title = title_elem.text.strip().split('\n')[0]
+                            link = title_elem.get_attribute("href")
+                            if link:
+                                if not link.startswith("http"):
+                                    link = url.rsplit('/', 1)[0] + '/' + link
+                                break
+                        except:
+                            pass
+                        
+                        # Try button with data-href or onclick
+                        try:
+                            button = cells[i].find_element(By.TAG_NAME, "button")
+                            link = button.get_attribute("data-href") or button.get_attribute("data-url")
+                            if link:
+                                title = cells[0].text.strip().split('\n')[0] if i > 0 else button.text.strip()
+                                if not link.startswith("http"):
+                                    link = url.rsplit('/', 1)[0] + '/' + link
+                                break
+                        except:
+                            pass
+                        
+                        # Try link inside button
+                        try:
+                            button_link = cells[i].find_element(By.CSS_SELECTOR, "button a, a button")
+                            link = button_link.get_attribute("href")
+                            if link:
+                                title = cells[0].text.strip().split('\n')[0]
+                                if not link.startswith("http"):
+                                    link = url.rsplit('/', 1)[0] + '/' + link
+                                break
+                        except:
+                            pass
+                    
+                    # If still no link, try to construct from row data
+                    if not link:
+                        # Bonfire URLs often follow pattern: /portal/...opportunityId=XXX
+                        # Try to find opportunity ID in row
+                        row_html = row.get_attribute("innerHTML")
+                        if "opportunityId=" in row_html or "opportunity/" in row_html:
+                            import re
+                            opp_id_match = re.search(r'opportunityId[=\\/](\d+)', row_html)
+                            if opp_id_match:
+                                opp_id = opp_id_match.group(1)
+                                link = f"{url}&opportunityId={opp_id}"
+                                title = cells[0].text.strip().split('\n')[0] if cells else "Unknown"
+                    
+                    # If no specific link found, use the organization's RFQ page as fallback
+                    if not link:
+                        link = url  # Use the main RFQ listing page
+                        print(f"⚠️ No specific link found for {org}, using main page: {url}")
+                    
+                    # If no title found, try to extract from cell text
+                    if not title and cells:
+                        title = cells[0].text.strip().split('\n')[0]
+                        if not title:
+                            title = f"RFQ from {org}"  # Last resort
+                        print(f"⚠️ Extracted title from cell text: {title[:50]}...")
+                        
+                except Exception as e:
+                    print(f"❌ Error extracting title/link: {e}")
+                    continue
 
-            rfp_number = cells[0].text.strip().split('\n')[1].replace("Project No. ", "") if '\n' in cells[0].text else cells[1].text.strip()
-            due_date = cells[1].text.strip() if org == "City of Mesa" else cells[2].text.strip()
-            documents = cells[2].text.strip().split('\n') if org == "City of Mesa" and cell_count > 2 else []
-            status = cells[3].text.strip() if cell_count > 3 else "Open"
+                try:
+                    rfp_number = cells[0].text.strip().split('\n')[1].replace("Project No. ", "") if '\n' in cells[0].text else cells[1].text.strip()
+                    due_date = cells[1].text.strip() if org == "City of Mesa" else cells[2].text.strip()
+                    documents = cells[2].text.strip().split('\n') if org == "City of Mesa" and cell_count > 2 else []
+                    status = cells[3].text.strip() if cell_count > 3 else "Open"
+                except Exception as e:
+                    print(f"Error extracting fields: {e}")
+                    print(f"Cell 0: {cells[0].text[:100] if cells else 'N/A'}")
+                    continue
 
-            title_lower = title.lower()
-            work_type = "unknown"
-            if any(word in title_lower for word in ["utility", "irrigation", "sewer", "transportation", "road", "bridge", "hydraulics", "storm drain"]):
-                work_type = "utility/transportation"
-            elif any(word in title_lower for word in ["landscaping", "maintenance"]):
-                work_type = "maintenance"
+                title_lower = title.lower()
+                work_type = "unknown"
+                if any(word in title_lower for word in ["utility", "irrigation", "sewer", "transportation", "road", "bridge", "hydraulics", "storm drain"]):
+                    work_type = "utility/transportation"
+                elif any(word in title_lower for word in ["landscaping", "maintenance"]):
+                    work_type = "maintenance"
 
-            open_date = date.today().strftime("%Y-%m-%d")
-            data.append({
-                "organization": org,
-                "rfp_number": rfp_number,
-                "title": title,
-                "work_type": work_type,
-                "open_date": open_date,
-                "due_date": due_date,
-                "status": status,
-                "link": link,
-                "documents": documents
-            })
+                open_date = date.today().strftime("%Y-%m-%d")
+                
+                # Check for duplicates
+                if title in seen_titles:
+                    continue  # Skip duplicate
+                seen_titles.add(title)
+                
+                data.append({
+                    "organization": org,
+                    "rfp_number": rfp_number,
+                    "title": title,
+                    "work_type": work_type,
+                    "open_date": open_date,
+                    "due_date": due_date,
+                    "status": status,
+                    "link": link,
+                    "documents": documents
+                })
+                print(f"✓ Added: {title[:50]}...")
+                rfq_count_for_city += 1
+            
+            # Check for next page
+            if has_pagination and page_num < max_pages:
+                try:
+                    next_buttons = driver.find_elements(By.CSS_SELECTOR, pagination_selector)
+                    print(f"Found {len(next_buttons)} potential next page buttons for {org}")
+                    
+                    clicked = False
+                    for next_button in next_buttons:
+                        try:
+                            if next_button.is_displayed() and next_button.is_enabled():
+                                button_text = next_button.text or next_button.get_attribute('title') or next_button.get_attribute('aria-label')
+                                
+                                # Skip column headers and non-numeric buttons
+                                if button_text and button_text.upper() in ['RFP NUMBER', 'TITLE', 'DUE DATE', 'STATUS', 'DATE', 'SORT']:
+                                    continue
+                                
+                                # Only click if it's a number greater than current page or contains "next"
+                                if button_text and (button_text.isdigit() and int(button_text) > page_num) or 'next' in button_text.lower():
+                                    print(f"Trying to click pagination button: '{button_text}'")
+                                    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", next_button)
+                                    time.sleep(0.5)
+                                    next_button.click()
+                                    page_num += 1
+                                    time.sleep(3)  # Wait for next page to load
+                                    clicked = True
+                                    break
+                        except Exception as e:
+                            print(f"Failed to click button: {e}")
+                            continue
+                    
+                    if not clicked:
+                        print(f"No more pages for {org}")
+                        break
+                except Exception as e:
+                    print(f"Pagination error for {org}: {e}")
+                    break
+            else:
+                if page_num >= max_pages:
+                    print(f"Reached max pages ({max_pages}) for {org}")
+                break
 
-        # Pause after Gilbert
-        if org == "City of Gilbert":
-            print("Paused after Gilbert. Data so far:")
-            print(json.dumps(data, indent=4))
-            input("Press Enter to continue...")
+        # Record successful scrape
+        health_monitor.record_city_result(
+            org, 
+            rfq_count_for_city, 
+            status="success",
+            strategy_used=strategy_used or site.get("strategy_name", "default")
+        )
+        
     except Exception as e:
         print(f"{org} Error: {e}")
+        scrape_error = str(e)
+        
+        # Record failed scrape
+        health_monitor.record_city_result(
+            org,
+            rfq_count_for_city,
+            status="error",
+            error=str(e)
+        )
         # OCR fallback
         screenshot_path = os.path.join(os.path.dirname(__file__), f"{org.lower().replace(' ', '_')}_screenshot.png")
         try:
@@ -164,9 +371,44 @@ for site in sites:
         except Exception as ocr_e:
             print(f"OCR failed for {org}: {ocr_e}")
 
-driver.switch_to.default_content()
-with open("rfqs.json", "w") as f:
-    json.dump(data, f, indent=4)
+# Process jobs through tracking system (assigns IDs, preserves user decisions)
+print(f"\n📊 Processing {len(data)} scraped jobs through tracking system...")
+enhanced_data = job_tracker.process_scraped_jobs(data)
 
-print(f"Scraped {len(data)} open RFQs from all sites and saved to rfqs.json")
-driver.quit()
+# Save enhanced data with job IDs
+with open("rfqs.json", "w") as f:
+    json.dump(enhanced_data, f, indent=4)
+print(f"✅ Saved {len(enhanced_data)} RFQs with job tracking to rfqs.json")
+
+# Show job tracking stats
+tracking_stats = job_tracker.get_stats()
+print(f"\n📈 Job Tracking Stats:")
+print(f"   Total jobs in database: {tracking_stats.get('total_jobs', 0)}")
+print(f"   New jobs this run: {tracking_stats['by_status'].get('new', 0)}")
+print(f"   User ignored: {tracking_stats['by_status'].get('ignore', 0)}")
+print(f"   Pursuing: {tracking_stats['by_status'].get('pursuing', 0)}")
+print(f"   Completed: {tracking_stats['by_status'].get('completed', 0)}")
+
+# Update cities.json if strategies changed
+if cities_config_updated:
+    print("\n📝 Updating cities.json with new working strategies...")
+    with open("cities.json", "w") as f:
+        json.dump(sites, f, indent=4)
+    print("✅ cities.json updated")
+
+# Save health monitoring data
+health_monitor.save_run()
+print("\n" + "="*60)
+print("HEALTH REPORT")
+print("="*60)
+health_monitor.send_notification(method="console")
+
+# Safe cleanup
+try:
+    driver.switch_to.default_content()
+except:
+    pass
+try:
+    driver.quit()
+except:
+    pass

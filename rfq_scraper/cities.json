@@ -5,7 +5,10 @@
         "row_selector": "table tbody tr",
         "cell_count": 4,
         "is_dynamic": false,
-        "manual": false
+        "manual": false,
+        "has_pagination": true,
+        "pagination_selector": ".pagination a, .pager a, a[href*='page'], a[class*='next'], a[rel='next']",
+        "skip_wait": true
     },
     {
         "organization": "City of Mesa",
@@ -26,18 +29,18 @@
     {
         "organization": "City of Yuma",
         "url": "https://yumaaz.bonfirehub.com/portal/?tab=openOpportunities",
-        "row_selector": ".opportunity-item",
-        "cell_count": 4,
+        "row_selector": "table tbody tr",
+        "cell_count": 2,
         "is_dynamic": true,
-        "manual": true
+        "manual": false
     },
     {
         "organization": "Pinal County",
         "url": "https://pinalcountyaz.bonfirehub.com/portal/?tab=openOpportunities",
-        "row_selector": ".opportunity-item",
-        "cell_count": 4,
+        "row_selector": "table tbody tr",
+        "cell_count": 2,
         "is_dynamic": true,
-        "manual": true
+        "manual": false
     },
     {
         "organization": "Town of Florence",
@@ -45,7 +48,7 @@
         "row_selector": ".opportunity-row",
         "cell_count": 4,
         "is_dynamic": true,
-        "manual": true
+        "manual": false
     },
     {
         "organization": "Town of Queen Creek",
@@ -53,6 +56,6 @@
         "row_selector": ".opportunity-row",
         "cell_count": 4,
         "is_dynamic": true,
-        "manual": true
+        "manual": false
     }
 ]
