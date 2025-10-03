@@ -1,0 +1,29 @@
+# Python Dependencies for Civil Engineering RFQ App
+
+# Web Scraping
+selenium==4.35.0
+undetected-chromedriver==3.5.5
+
+# Image Processing & OCR
+Pillow==11.3.0
+pytesseract
+opencv-python
+
+# Backend API
+fastapi
+uvicorn[standard]
+
+# Frontend (handled by npm/package.json in rfq-app/)
+# - react
+# - react-dom
+# - react-scripts
+
+# Other
+requests
+websockets
+
+# Notes:
+# - Chrome browser must be installed (version 140.x currently)
+# - Tesseract OCR must be installed separately (https://github.com/tesseract-ocr/tesseract)
+#   Default path: C:\Program Files\Tesseract-OCR\tesseract.exe
+
