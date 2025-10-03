@@ -1,0 +1,231 @@
+{
+    "runs": [
+        {
+            "timestamp": "2025-10-02T13:36:09.930992",
+            "cities": {
+                "City of Gilbert": {
+                    "rfq_count": 30,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Mesa": {
+                    "rfq_count": 0,
+                    "status": "error",
+                    "error": "Message: invalid session id: session deleted as the browser has closed the connection\nfrom disconnected: not connected to DevTools\n  (Session info: chrome=140.0.7339.208); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\n\tGetHandleVerifier [0x0x7ff73f461eb5+80197]\n\tGetHandleVerifier [0x0x7ff73f461f10+80288]\n\t(No symbol) [0x0x7ff73f1e02fa]\n\t(No symbol) [0x0x7ff73f1cc0a5]\n\t(No symbol) [0x0x7ff73f1f144a]\n\t(No symbol) [0x0x7ff73f267be6]\n\t(No symbol) [0x0x7ff73f288132]\n\t(No symbol) [0x0x7ff73f260153]\n\t(No symbol) [0x0x7ff73f228b02]\n\t(No symbol) [0x0x7ff73f2298d3]\n\tGetHandleVerifier [0x0x7ff73f71e83d+2949837]\n\tGetHandleVerifier [0x0x7ff73f718c6a+2926330]\n\tGetHandleVerifier [0x0x7ff73f7386c7+3055959]\n\tGetHandleVerifier [0x0x7ff73f47cfee+191102]\n\tGetHandleVerifier [0x0x7ff73f4850af+224063]\n\tGetHandleVerifier [0x0x7ff73f46af64+117236]\n\tGetHandleVerifier [0x0x7ff73f46b119+117673]\n\tGetHandleVerifier [0x0x7ff73f4510a8+11064]\n\tBaseThreadInitThunk [0x0x7ffd30d5e8d7+23]\n\tRtlUserThreadStart [0x0x7ffd31be8d9c+44]\n",
+                    "strategy_used": null
+                },
+                "City of Apache Junction": {
+                    "rfq_count": 0,
+                    "status": "error",
+                    "error": "Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\n\tGetHandleVerifier [0x0x7ff73f461eb5+80197]\n\tGetHandleVerifier [0x0x7ff73f461f10+80288]\n\t(No symbol) [0x0x7ff73f1e011c]\n\t(No symbol) [0x0x7ff73f227c1d]\n\t(No symbol) [0x0x7ff73f260242]\n\t(No symbol) [0x0x7ff73f25ac14]\n\t(No symbol) [0x0x7ff73f259cca]\n\t(No symbol) [0x0x7ff73f1aa755]\n\tGetHandleVerifier [0x0x7ff73f71e83d+2949837]\n\tGetHandleVerifier [0x0x7ff73f718c6a+2926330]\n\tGetHandleVerifier [0x0x7ff73f7386c7+3055959]\n\tGetHandleVerifier [0x0x7ff73f47cfee+191102]\n\tGetHandleVerifier [0x0x7ff73f4850af+224063]\n\t(No symbol) [0x0x7ff73f1a9731]\n\tGetHandleVerifier [0x0x7ff73f84b568+4182008]\n\tBaseThreadInitThunk [0x0x7ffd30d5e8d7+23]\n\tRtlUserThreadStart [0x0x7ffd31be8d9c+44]\n",
+                    "strategy_used": null
+                },
+                "City of Yuma": {
+                    "rfq_count": 0,
+                    "status": "error",
+                    "error": "Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\n\tGetHandleVerifier [0x0x7ff73f461eb5+80197]\n\tGetHandleVerifier [0x0x7ff73f461f10+80288]\n\t(No symbol) [0x0x7ff73f1e011c]\n\t(No symbol) [0x0x7ff73f227c1d]\n\t(No symbol) [0x0x7ff73f260242]\n\t(No symbol) [0x0x7ff73f25ac14]\n\t(No symbol) [0x0x7ff73f259cca]\n\t(No symbol) [0x0x7ff73f1aa755]\n\tGetHandleVerifier [0x0x7ff73f71e83d+2949837]\n\tGetHandleVerifier [0x0x7ff73f718c6a+2926330]\n\tGetHandleVerifier [0x0x7ff73f7386c7+3055959]\n\tGetHandleVerifier [0x0x7ff73f47cfee+191102]\n\tGetHandleVerifier [0x0x7ff73f4850af+224063]\n\t(No symbol) [0x0x7ff73f1a9731]\n\tGetHandleVerifier [0x0x7ff73f84b568+4182008]\n\tBaseThreadInitThunk [0x0x7ffd30d5e8d7+23]\n\tRtlUserThreadStart [0x0x7ffd31be8d9c+44]\n",
+                    "strategy_used": null
+                },
+                "Pinal County": {
+                    "rfq_count": 0,
+                    "status": "error",
+                    "error": "Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\n\tGetHandleVerifier [0x0x7ff73f461eb5+80197]\n\tGetHandleVerifier [0x0x7ff73f461f10+80288]\n\t(No symbol) [0x0x7ff73f1e011c]\n\t(No symbol) [0x0x7ff73f227c1d]\n\t(No symbol) [0x0x7ff73f260242]\n\t(No symbol) [0x0x7ff73f25ac14]\n\t(No symbol) [0x0x7ff73f259cca]\n\t(No symbol) [0x0x7ff73f1aa755]\n\tGetHandleVerifier [0x0x7ff73f71e83d+2949837]\n\tGetHandleVerifier [0x0x7ff73f718c6a+2926330]\n\tGetHandleVerifier [0x0x7ff73f7386c7+3055959]\n\tGetHandleVerifier [0x0x7ff73f47cfee+191102]\n\tGetHandleVerifier [0x0x7ff73f4850af+224063]\n\t(No symbol) [0x0x7ff73f1a9731]\n\tGetHandleVerifier [0x0x7ff73f84b568+4182008]\n\tBaseThreadInitThunk [0x0x7ffd30d5e8d7+23]\n\tRtlUserThreadStart [0x0x7ffd31be8d9c+44]\n",
+                    "strategy_used": null
+                },
+                "Town of Florence": {
+                    "rfq_count": 0,
+                    "status": "error",
+                    "error": "Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\n\tGetHandleVerifier [0x0x7ff73f461eb5+80197]\n\tGetHandleVerifier [0x0x7ff73f461f10+80288]\n\t(No symbol) [0x0x7ff73f1e011c]\n\t(No symbol) [0x0x7ff73f227c1d]\n\t(No symbol) [0x0x7ff73f260242]\n\t(No symbol) [0x0x7ff73f25ac14]\n\t(No symbol) [0x0x7ff73f259cca]\n\t(No symbol) [0x0x7ff73f1aa755]\n\tGetHandleVerifier [0x0x7ff73f71e83d+2949837]\n\tGetHandleVerifier [0x0x7ff73f718c6a+2926330]\n\tGetHandleVerifier [0x0x7ff73f7386c7+3055959]\n\tGetHandleVerifier [0x0x7ff73f47cfee+191102]\n\tGetHandleVerifier [0x0x7ff73f4850af+224063]\n\t(No symbol) [0x0x7ff73f1a9731]\n\tGetHandleVerifier [0x0x7ff73f84b568+4182008]\n\tBaseThreadInitThunk [0x0x7ffd30d5e8d7+23]\n\tRtlUserThreadStart [0x0x7ffd31be8d9c+44]\n",
+                    "strategy_used": null
+                },
+                "Town of Queen Creek": {
+                    "rfq_count": 0,
+                    "status": "error",
+                    "error": "Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception\nStacktrace:\n\tGetHandleVerifier [0x0x7ff73f461eb5+80197]\n\tGetHandleVerifier [0x0x7ff73f461f10+80288]\n\t(No symbol) [0x0x7ff73f1e011c]\n\t(No symbol) [0x0x7ff73f227c1d]\n\t(No symbol) [0x0x7ff73f260242]\n\t(No symbol) [0x0x7ff73f25ac14]\n\t(No symbol) [0x0x7ff73f259cca]\n\t(No symbol) [0x0x7ff73f1aa755]\n\tGetHandleVerifier [0x0x7ff73f71e83d+2949837]\n\tGetHandleVerifier [0x0x7ff73f718c6a+2926330]\n\tGetHandleVerifier [0x0x7ff73f7386c7+3055959]\n\tGetHandleVerifier [0x0x7ff73f47cfee+191102]\n\tGetHandleVerifier [0x0x7ff73f4850af+224063]\n\t(No symbol) [0x0x7ff73f1a9731]\n\tGetHandleVerifier [0x0x7ff73f84b568+4182008]\n\tBaseThreadInitThunk [0x0x7ffd30d5e8d7+23]\n\tRtlUserThreadStart [0x0x7ffd31be8d9c+44]\n",
+                    "strategy_used": null
+                }
+            },
+            "total_rfqs": 30,
+            "alerts": [
+                {
+                    "city": "City of Mesa",
+                    "severity": "warning",
+                    "message": "First scrape failed: error"
+                },
+                {
+                    "city": "City of Apache Junction",
+                    "severity": "warning",
+                    "message": "First scrape failed: error"
+                },
+                {
+                    "city": "City of Yuma",
+                    "severity": "warning",
+                    "message": "First scrape failed: error"
+                },
+                {
+                    "city": "Pinal County",
+                    "severity": "warning",
+                    "message": "First scrape failed: error"
+                },
+                {
+                    "city": "Town of Florence",
+                    "severity": "warning",
+                    "message": "First scrape failed: error"
+                },
+                {
+                    "city": "Town of Queen Creek",
+                    "severity": "warning",
+                    "message": "First scrape failed: error"
+                }
+            ]
+        },
+        {
+            "timestamp": "2025-10-02T13:57:09.187094",
+            "cities": {
+                "City of Gilbert": {
+                    "rfq_count": 30,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Mesa": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Apache Junction": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Yuma": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pinal County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Florence": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Queen Creek": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 42,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-02T14:06:04.123032",
+            "cities": {
+                "City of Gilbert": {
+                    "rfq_count": 30,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Mesa": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Apache Junction": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Yuma": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pinal County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Florence": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Queen Creek": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 42,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-02T14:24:31.503996",
+            "cities": {
+                "City of Gilbert": {
+                    "rfq_count": 30,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Mesa": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Apache Junction": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Yuma": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pinal County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Florence": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Queen Creek": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 44,
+            "alerts": []
+        }
+    ]
+}

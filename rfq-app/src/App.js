@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import JobDetails from './JobDetails';
 
 function App() {
     const [rfqs, setRfqs] = useState([]);
@@ -18,6 +19,9 @@ function App() {
         searchTerm: '',
         hideIgnored: true  // Hide ignored by default
     });
+    
+    // Selected job for detail view
+    const [selectedJobId, setSelectedJobId] = useState(null);
 
     useEffect(() => {
         fetch('http://localhost:8000/rfqs')
@@ -99,6 +103,23 @@ function App() {
             .catch(err => console.error('Error updating job status:', err));
     };
 
+    const updateWorkType = (jobId, workType) => {
+        fetch('http://localhost:8000/update_work_type', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ job_id: jobId, work_type: workType })
+        })
+            .then(res => res.json())
+            .then(data => {
+                // Update local state
+                setRfqs(rfqs.map(rfq => 
+                    rfq.job_id === jobId ? { ...rfq, work_type: workType } : rfq
+                ));
+                console.log('Updated work type:', data);
+            })
+            .catch(err => console.error('Error updating work type:', err));
+    };
+
     // Apply filters
     const filteredRfqs = rfqs.filter(rfq => {
         // Filter by work type
@@ -128,6 +149,18 @@ function App() {
 
     // Get unique organizations for filter dropdown
     const organizations = [...new Set(rfqs.map(rfq => rfq.organization))].sort();
+
+    // If viewing a specific job, show the JobDetails component
+    if (selectedJobId) {
+        return <JobDetails jobId={selectedJobId} onBack={() => {
+            setSelectedJobId(null);
+            // Refresh RFQs list when returning
+            fetch('http://localhost:8000/rfqs')
+                .then(res => res.json())
+                .then(data => setRfqs(data))
+                .catch(err => console.error('Error fetching RFQs:', err));
+        }} />;
+    }
 
     return (
         <div className="container mt-4">
@@ -161,9 +194,16 @@ function App() {
                                 onChange={e => setFilters({...filters, workType: e.target.value})}
                             >
                                 <option value="all">All Types</option>
+                                <option value="civil">Civil Engineering</option>
                                 <option value="utility/transportation">Utility/Transportation</option>
                                 <option value="maintenance">Maintenance</option>
-                                <option value="unknown">Other</option>
+                                <option value="architecture">Architecture</option>
+                                <option value="mechanical">Mechanical</option>
+                                <option value="electrical">Electrical</option>
+                                <option value="environmental">Environmental</option>
+                                <option value="it">IT/Technology</option>
+                                <option value="other">Other</option>
+                                <option value="unknown">Unknown</option>
                             </select>
                         </div>
                         <div className="col-md-2">
@@ -234,6 +274,7 @@ function App() {
                             <thead>
                                 <tr>
                                     <th>Status</th>
+                                    <th>Job ID</th>
                                     <th>Organization</th>
                                     <th>Title</th>
                                     <th>Work Type</th>
@@ -244,7 +285,7 @@ function App() {
                             <tbody>
                                 {filteredRfqs.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className="text-center text-muted">
+                                        <td colSpan="7" className="text-center text-muted">
                                             No RFQs match your filters
                                         </td>
                                     </tr>
@@ -258,15 +299,46 @@ function App() {
                                                 {rfq.user_status === 'declined' && <span className="badge bg-secondary">Declined</span>}
                                                 {rfq.user_status === 'ignore' && <span className="badge bg-danger">Ignored</span>}
                                             </td>
+                                            <td>
+                                                <a
+                                                    href="#"
+                                                    className="font-monospace text-decoration-none"
+                                                    title={`View details for ${rfq.job_id}`}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setSelectedJobId(rfq.job_id);
+                                                    }}
+                                                >
+                                                    {rfq.job_id ? rfq.job_id.substring(0, 8) : 'N/A'}
+                                                </a>
+                                            </td>
                                             <td><small>{rfq.organization}</small></td>
                                             <td>
                                                 <a href={rfq.link || '#'} target="_blank" rel="noopener noreferrer">
                                                     {rfq.title}
                                                 </a>
                                                 <br />
-                                                <small className="text-muted">#{rfq.rfp_number}</small>
+                                                <small className="text-muted">Org #: {rfq.rfp_number}</small>
                                             </td>
-                                            <td><span className="badge bg-light text-dark">{rfq.work_type}</span></td>
+                                            <td>
+                                                <select 
+                                                    className="form-select form-select-sm"
+                                                    value={rfq.work_type || 'unknown'}
+                                                    onChange={(e) => updateWorkType(rfq.job_id, e.target.value)}
+                                                    style={{minWidth: '150px'}}
+                                                >
+                                                    <option value="civil">Civil Engineering</option>
+                                                    <option value="utility/transportation">Utility/Transportation</option>
+                                                    <option value="maintenance">Maintenance</option>
+                                                    <option value="architecture">Architecture</option>
+                                                    <option value="mechanical">Mechanical</option>
+                                                    <option value="electrical">Electrical</option>
+                                                    <option value="environmental">Environmental</option>
+                                                    <option value="it">IT/Technology</option>
+                                                    <option value="other">Other</option>
+                                                    <option value="unknown">Unknown</option>
+                                                </select>
+                                            </td>
                                             <td>{rfq.due_date}</td>
                                             <td>
                                                 <div className="btn-group btn-group-sm" role="group">

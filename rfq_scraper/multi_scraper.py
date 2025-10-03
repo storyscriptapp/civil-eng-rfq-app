@@ -227,10 +227,32 @@ for site_idx, site in enumerate(sites):
                     continue
 
                 try:
-                    rfp_number = cells[0].text.strip().split('\n')[1].replace("Project No. ", "") if '\n' in cells[0].text else cells[1].text.strip()
-                    due_date = cells[1].text.strip() if org == "City of Mesa" else cells[2].text.strip()
-                    documents = cells[2].text.strip().split('\n') if org == "City of Mesa" and cell_count > 2 else []
-                    status = cells[3].text.strip() if cell_count > 3 else "Open"
+                    # Bonfire sites (Yuma, Pinal) have different structure
+                    is_bonfire = "bonfire" in url.lower()
+                    
+                    if is_bonfire:
+                        # Bonfire: cell[0] = RFP# + Title (multiline), cell[1] = Due Date
+                        cell_0_text = cells[0].text.strip()
+                        lines = [line.strip() for line in cell_0_text.split('\n') if line.strip()]
+                        
+                        if len(lines) >= 2:
+                            rfp_number = lines[0]  # First line is RFP number
+                            # If title wasn't extracted from link, use second line
+                            if title == "View Opportunity" or not title or title.startswith("RFQ from"):
+                                title = lines[1]  # Second line is actual title
+                        else:
+                            rfp_number = lines[0] if lines else "N/A"
+                        
+                        due_date = cells[1].text.strip() if len(cells) > 1 else "N/A"
+                        documents = []
+                        status = "Open"
+                    else:
+                        # Regular sites (Mesa, Gilbert, etc.)
+                        rfp_number = cells[0].text.strip().split('\n')[1].replace("Project No. ", "") if '\n' in cells[0].text else cells[1].text.strip()
+                        due_date = cells[1].text.strip() if org == "City of Mesa" else cells[2].text.strip()
+                        documents = cells[2].text.strip().split('\n') if org == "City of Mesa" and cell_count > 2 else []
+                        status = cells[3].text.strip() if cell_count > 3 else "Open"
+                        
                 except Exception as e:
                     print(f"Error extracting fields: {e}")
                     print(f"Cell 0: {cells[0].text[:100] if cells else 'N/A'}")

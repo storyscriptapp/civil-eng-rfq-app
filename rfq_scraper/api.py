@@ -81,6 +81,182 @@ async def update_job_status(data: dict):
     except Exception as e:
         return {"error": str(e)}
 
+@app.post("/update_work_type")
+async def update_work_type(data: dict):
+    job_id = data.get("job_id")
+    work_type = data.get("work_type")
+    
+    if not job_id or not work_type:
+        return {"error": "Missing job_id or work_type"}
+    
+    # Update in rfqs.json
+    rfqs_path = os.path.join(os.path.dirname(__file__), "rfqs.json")
+    try:
+        with open(rfqs_path, 'r') as f:
+            rfqs = json.load(f)
+        
+        # Update the specific job
+        for rfq in rfqs:
+            if rfq.get('job_id') == job_id:
+                rfq['work_type'] = work_type
+                break
+        
+        # Save back to file
+        with open(rfqs_path, 'w') as f:
+            json.dump(rfqs, f, indent=4)
+        
+        return {"status": "Work type updated", "job_id": job_id, "work_type": work_type}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/job_details/{job_id}")
+async def get_job_details(job_id: str):
+    """Get detailed information about a specific job including scrape history and journal entries"""
+    tracker = RFQJobTracker()
+    conn = tracker.conn
+    cursor = conn.cursor()
+    
+    # Get job details
+    cursor.execute("""
+        SELECT job_id, organization, title, rfp_number, work_type, due_date, 
+               link, user_status, user_notes, first_seen, last_seen
+        FROM rfq_jobs
+        WHERE job_id = ?
+    """, (job_id,))
+    
+    job = cursor.fetchone()
+    if not job:
+        return {"error": "Job not found"}
+    
+    job_dict = {
+        "job_id": job[0],
+        "organization": job[1],
+        "title": job[2],
+        "rfp_number": job[3],
+        "work_type": job[4],
+        "due_date": job[5],
+        "link": job[6],
+        "user_status": job[7],
+        "user_notes": job[8],
+        "first_seen": job[9],
+        "last_seen": job[10]
+    }
+    
+    # Get scrape history
+    cursor.execute("""
+        SELECT scraped_at FROM rfq_jobs WHERE job_id = ?
+        ORDER BY scraped_at DESC
+    """, (job_id,))
+    
+    scrape_history = [{"scraped_at": row[0]} for row in cursor.fetchall()]
+    
+    # Get journal entries (stored in a new table we'll create)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS job_journal (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            job_id TEXT NOT NULL,
+            entry_text TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            user_name TEXT DEFAULT 'User',
+            FOREIGN KEY (job_id) REFERENCES rfq_jobs(job_id)
+        )
+    """)
+    conn.commit()
+    
+    cursor.execute("""
+        SELECT entry_text, created_at, user_name
+        FROM job_journal
+        WHERE job_id = ?
+        ORDER BY created_at DESC
+    """, (job_id,))
+    
+    journal_entries = [
+        {"text": row[0], "created_at": row[1], "user_name": row[2]}
+        for row in cursor.fetchall()
+    ]
+    
+    return {
+        "job": job_dict,
+        "scrape_history": scrape_history,
+        "journal_entries": journal_entries
+    }
+
+@app.post("/update_job_details")
+async def update_job_details(data: dict):
+    """Update job title and other editable fields"""
+    job_id = data.get("job_id")
+    title = data.get("title")
+    
+    if not job_id:
+        return {"error": "Missing job_id"}
+    
+    # Update in tracking database
+    tracker = RFQJobTracker()
+    conn = tracker.conn
+    cursor = conn.cursor()
+    
+    if title:
+        cursor.execute("""
+            UPDATE rfq_jobs SET title = ? WHERE job_id = ?
+        """, (title, job_id))
+        conn.commit()
+    
+    # Also update in rfqs.json
+    rfqs_path = os.path.join(os.path.dirname(__file__), "rfqs.json")
+    try:
+        with open(rfqs_path, 'r') as f:
+            rfqs = json.load(f)
+        
+        for rfq in rfqs:
+            if rfq.get('job_id') == job_id:
+                if title:
+                    rfq['title'] = title
+                break
+        
+        with open(rfqs_path, 'w') as f:
+            json.dump(rfqs, f, indent=4)
+        
+        return {"status": "Job updated", "job_id": job_id}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.post("/add_journal_entry")
+async def add_journal_entry(data: dict):
+    """Add a journal entry for a job"""
+    job_id = data.get("job_id")
+    entry_text = data.get("entry_text")
+    user_name = data.get("user_name", "User")
+    
+    if not job_id or not entry_text:
+        return {"error": "Missing job_id or entry_text"}
+    
+    tracker = RFQJobTracker()
+    conn = tracker.conn
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        INSERT INTO job_journal (job_id, entry_text, user_name)
+        VALUES (?, ?, ?)
+    """, (job_id, entry_text, user_name))
+    conn.commit()
+    
+    # Get the created entry
+    cursor.execute("""
+        SELECT entry_text, created_at, user_name
+        FROM job_journal
+        WHERE id = last_insert_rowid()
+    """)
+    entry = cursor.fetchone()
+    
+    return {
+        "status": "Journal entry added",
+        "entry": {
+            "text": entry[0],
+            "created_at": entry[1],
+            "user_name": entry[2]
+        }
+    }
+
 @app.post("/parse_text")
 async def parse_text(data: dict):
     text = data.get("text", "")
