@@ -11,6 +11,8 @@ class RFQJobTracker:
     def __init__(self, db_path="rfq_tracking.db"):
         self.db_path = db_path
         self._init_db()
+        # Keep a persistent connection for API use
+        self.conn = sqlite3.connect(self.db_path)
     
     def _init_db(self):
         """Initialize database with tracking tables"""
@@ -54,9 +56,11 @@ class RFQJobTracker:
         """
         Generate a unique, stable ID for a job
         Same RFQ always gets same ID, even across scrapes
+        Based on org + rfp_number only (not title) to handle title corrections
         """
-        # Create hash from org + rfp_number + title
-        unique_string = f"{org}|{rfp_number}|{title}".lower().strip()
+        # Create hash from org + rfp_number only (more stable when orgs fix typos)
+        # This allows titles to be updated without creating duplicate jobs
+        unique_string = f"{org}|{rfp_number}".lower().strip()
         hash_obj = hashlib.sha256(unique_string.encode())
         job_id = hash_obj.hexdigest()[:12]  # 12 chars is enough
         return f"RFQ-{job_id}"
@@ -95,15 +99,16 @@ class RFQJobTracker:
             existing = cursor.fetchone()
             
             if existing:
-                # Update existing job
+                # Update existing job (including title in case they fix typos)
                 cursor.execute("""
                     UPDATE jobs SET
+                        title = ?,
                         last_seen = ?,
                         due_date = ?,
                         status = ?,
                         work_type = ?
                     WHERE job_id = ?
-                """, (today, job['due_date'], job['status'], job['work_type'], job_id))
+                """, (job['title'], today, job['due_date'], job['status'], job['work_type'], job_id))
                 
                 # Keep user's previous status
                 job['job_id'] = job_id

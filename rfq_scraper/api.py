@@ -118,9 +118,9 @@ async def get_job_details(job_id: str):
     
     # Get job details
     cursor.execute("""
-        SELECT job_id, organization, title, rfp_number, work_type, due_date, 
+        SELECT job_id, organization, title, rfq_number, work_type, due_date, 
                link, user_status, user_notes, first_seen, last_seen
-        FROM rfq_jobs
+        FROM jobs
         WHERE job_id = ?
     """, (job_id,))
     
@@ -142,13 +142,18 @@ async def get_job_details(job_id: str):
         "last_seen": job[10]
     }
     
-    # Get scrape history
+    # Get scrape history (first_seen and last_seen from jobs table)
     cursor.execute("""
-        SELECT scraped_at FROM rfq_jobs WHERE job_id = ?
-        ORDER BY scraped_at DESC
+        SELECT first_seen, last_seen FROM jobs WHERE job_id = ?
     """, (job_id,))
     
-    scrape_history = [{"scraped_at": row[0]} for row in cursor.fetchall()]
+    scrape_result = cursor.fetchone()
+    scrape_history = []
+    if scrape_result:
+        scrape_history = [
+            {"scraped_at": scrape_result[0], "label": "First Seen"},
+            {"scraped_at": scrape_result[1], "label": "Last Seen"}
+        ]
     
     # Get journal entries (stored in a new table we'll create)
     cursor.execute("""
@@ -158,7 +163,7 @@ async def get_job_details(job_id: str):
             entry_text TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             user_name TEXT DEFAULT 'User',
-            FOREIGN KEY (job_id) REFERENCES rfq_jobs(job_id)
+            FOREIGN KEY (job_id) REFERENCES jobs(job_id)
         )
     """)
     conn.commit()
@@ -197,7 +202,7 @@ async def update_job_details(data: dict):
     
     if title:
         cursor.execute("""
-            UPDATE rfq_jobs SET title = ? WHERE job_id = ?
+            UPDATE jobs SET title = ? WHERE job_id = ?
         """, (title, job_id))
         conn.commit()
     
