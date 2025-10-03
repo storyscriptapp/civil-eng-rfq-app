@@ -113,12 +113,13 @@ async def update_work_type(data: dict):
 async def get_job_details(job_id: str):
     """Get detailed information about a specific job including scrape history and journal entries"""
     tracker = RFQJobTracker()
-    conn = tracker.conn
+    # Open a fresh connection to see latest database changes
+    conn = sqlite3.connect(tracker.db_path)
     cursor = conn.cursor()
     
     # Get job details
     cursor.execute("""
-        SELECT job_id, organization, title, rfq_number, work_type, due_date, 
+        SELECT job_id, organization, title, rfp_number, work_type, due_date, 
                link, user_status, user_notes, first_seen, last_seen
         FROM jobs
         WHERE job_id = ?
@@ -126,6 +127,7 @@ async def get_job_details(job_id: str):
     
     job = cursor.fetchone()
     if not job:
+        conn.close()
         return {"error": "Job not found"}
     
     job_dict = {
@@ -179,6 +181,8 @@ async def get_job_details(job_id: str):
         {"text": row[0], "created_at": row[1], "user_name": row[2]}
         for row in cursor.fetchall()
     ]
+    
+    conn.close()
     
     return {
         "job": job_dict,

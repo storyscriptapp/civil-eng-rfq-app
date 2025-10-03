@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import undetected_chromedriver as uc
 import json
 from datetime import date
 import time
@@ -45,6 +46,15 @@ def create_driver():
     driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
     return driver
 
+def create_undetected_driver():
+    """Create undetected Chrome driver for Cloudflare-protected sites"""
+    uc_options = uc.ChromeOptions()
+    uc_options.add_argument("--window-size=1920,1080")
+    uc_options.add_argument("--disable-blink-features=AutomationControlled")
+    # Use version_main=140 to match Chrome 140.x
+    driver = uc.Chrome(options=uc_options, version_main=140)
+    return driver
+
 driver = create_driver()
 
 data = []
@@ -59,6 +69,7 @@ for site_idx, site in enumerate(sites):
     has_pagination = site.get("has_pagination", False)
     pagination_selector = site.get("pagination_selector", "")
     skip_wait = site.get("skip_wait", False)
+    uses_cloudflare = site.get("uses_cloudflare", False)
     
     rfq_count_for_city = 0
     strategy_used = None
@@ -70,19 +81,45 @@ for site_idx, site in enumerate(sites):
         time.sleep(2)
 
     try:
-        # Check if browser is still alive, restart if needed
-        try:
-            driver.current_url  # This will fail if session is dead
-        except:
-            print(f"⚠️ Browser session died, restarting...")
+        # Switch to undetected driver for Cloudflare-protected sites
+        if uses_cloudflare:
+            print(f"🛡️ {org} uses Cloudflare - switching to undetected driver...")
             try:
                 driver.quit()
             except:
                 pass
-            driver = create_driver()
+            driver = create_undetected_driver()
+            time.sleep(2)  # Give the undetected driver time to start
+        else:
+            # Check if browser is still alive, restart if needed
+            try:
+                driver.current_url  # This will fail if session is dead
+            except:
+                print(f"⚠️ Browser session died, restarting...")
+                try:
+                    driver.quit()
+                except:
+                    pass
+                driver = create_driver()
         
         print(f"Scraping {org}...")
         driver.get(url)
+        
+        # Give Cloudflare time to verify the browser
+        if uses_cloudflare:
+            print(f"⏳ Waiting for Cloudflare verification...")
+            time.sleep(8)  # Wait for Cloudflare check to complete
+            # Try to detect and wait for Cloudflare challenge to pass
+            try:
+                wait_cf = WebDriverWait(driver, 15)
+                # Check if Cloudflare challenge is present
+                if "cf-browser-verification" in driver.page_source or "Just a moment" in driver.page_source:
+                    print(f"🔄 Cloudflare challenge detected, waiting...")
+                    time.sleep(5)
+            except:
+                pass
+            print(f"✓ Cloudflare verification complete")
+        
         wait = WebDriverWait(driver, 30)
         
         if skip_wait:
@@ -231,21 +268,21 @@ for site_idx, site in enumerate(sites):
                     is_bonfire = "bonfire" in url.lower()
                     
                     if is_bonfire:
-                        # Bonfire: cell[0] = RFP# + Title (multiline), cell[1] = Due Date
-                        cell_0_text = cells[0].text.strip()
-                        lines = [line.strip() for line in cell_0_text.split('\n') if line.strip()]
-                        
-                        if len(lines) >= 2:
-                            rfp_number = lines[0]  # First line is RFP number
-                            # If title wasn't extracted from link, use second line
-                            if title == "View Opportunity" or not title or title.startswith("RFQ from"):
-                                title = lines[1]  # Second line is actual title
+                        # Bonfire structure: cell[0]=Status, cell[1]=RFP#, cell[2]=Title, cell[3]=Due Date
+                        if len(cells) >= 3:
+                            status = cells[0].text.strip()
+                            rfp_number = cells[1].text.strip()
+                            title = cells[2].text.strip()
+                            due_date = cells[3].text.strip() if len(cells) > 3 else "N/A"
+                            print(f"✅ Bonfire: {rfp_number} - {title[:50]}...")
                         else:
-                            rfp_number = lines[0] if lines else "N/A"
+                            print(f"⚠️ Bonfire row has only {len(cells)} cells, expected 6+")
+                            rfp_number = "N/A"
+                            title = "Unknown RFQ"
+                            due_date = "N/A"
+                            status = "Open"
                         
-                        due_date = cells[1].text.strip() if len(cells) > 1 else "N/A"
                         documents = []
-                        status = "Open"
                     else:
                         # Regular sites (Mesa, Gilbert, etc.)
                         rfp_number = cells[0].text.strip().split('\n')[1].replace("Project No. ", "") if '\n' in cells[0].text else cells[1].text.strip()
@@ -392,6 +429,16 @@ for site_idx, site in enumerate(sites):
                 })
         except Exception as ocr_e:
             print(f"OCR failed for {org}: {ocr_e}")
+    
+    # Switch back to regular driver after Cloudflare sites
+    if uses_cloudflare:
+        print(f"✓ Finished {org}, switching back to regular driver...")
+        try:
+            driver.quit()
+        except:
+            pass
+        driver = create_driver()
+        time.sleep(1)
 
 # Process jobs through tracking system (assigns IDs, preserves user decisions)
 print(f"\n📊 Processing {len(data)} scraped jobs through tracking system...")

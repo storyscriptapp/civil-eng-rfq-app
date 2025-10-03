@@ -1,0 +1,3 @@
+start venv: in powershell run cd .\rfq_scraper AND .\venv\Scripts\Activate.ps1
+
+start webpage: uvicorn api:app --reload --port 8000 in rfq_scraper AND npm start in rfq-app

@@ -30,7 +30,7 @@
         "organization": "City of Yuma",
         "url": "https://yumaaz.bonfirehub.com/portal/?tab=openOpportunities",
         "row_selector": "table tbody tr",
-        "cell_count": 2,
+        "cell_count": 3,
         "is_dynamic": true,
         "manual": false,
         "has_pagination": true,
@@ -40,7 +40,7 @@
         "organization": "Pinal County",
         "url": "https://pinalcountyaz.bonfirehub.com/portal/?tab=openOpportunities",
         "row_selector": "table tbody tr",
-        "cell_count": 2,
+        "cell_count": 3,
         "is_dynamic": true,
         "manual": false,
         "has_pagination": true,
@@ -49,17 +49,21 @@
     {
         "organization": "Town of Florence",
         "url": "https://procurement.opengov.com/portal/florenceaz",
-        "row_selector": ".opportunity-row",
-        "cell_count": 4,
+        "row_selector": "div.row, .item",
+        "cell_count": 75,
         "is_dynamic": true,
-        "manual": false
+        "manual": false,
+        "uses_cloudflare": true,
+        "strategy_name": "div_rows"
     },
     {
         "organization": "Town of Queen Creek",
         "url": "https://procurement.opengov.com/portal/queencreekaz",
-        "row_selector": ".opportunity-row",
-        "cell_count": 4,
+        "row_selector": "div.row, .item",
+        "cell_count": 75,
         "is_dynamic": true,
-        "manual": false
+        "manual": false,
+        "uses_cloudflare": true,
+        "strategy_name": "div_rows"
     }
 ]

@@ -275,6 +275,311 @@
             },
             "total_rfqs": 44,
             "alerts": []
+        },
+        {
+            "timestamp": "2025-10-02T18:40:01.163108",
+            "cities": {
+                "City of Gilbert": {
+                    "rfq_count": 30,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Mesa": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Apache Junction": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Yuma": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pinal County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Florence": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Queen Creek": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 45,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-02T19:22:38.270361",
+            "cities": {
+                "City of Gilbert": {
+                    "rfq_count": 30,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Mesa": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Apache Junction": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Yuma": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pinal County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Florence": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Queen Creek": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 45,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-02T20:40:20.461972",
+            "cities": {
+                "City of Gilbert": {
+                    "rfq_count": 30,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Mesa": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Apache Junction": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Yuma": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pinal County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Florence": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Queen Creek": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 45,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-02T20:58:42.240997",
+            "cities": {
+                "City of Gilbert": {
+                    "rfq_count": 30,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Mesa": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Apache Junction": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Yuma": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pinal County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Florence": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Queen Creek": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 45,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-02T22:00:39.002007",
+            "cities": {
+                "City of Gilbert": {
+                    "rfq_count": 30,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Mesa": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Apache Junction": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Yuma": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pinal County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Florence": {
+                    "rfq_count": 0,
+                    "status": "error",
+                    "error": "Message: session not created: cannot connect to chrome at 127.0.0.1:54292\nfrom session not created: This version of ChromeDriver only supports Chrome version 141\nCurrent browser version is 140.0.7339.210; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#sessionnotcreatedexception\nStacktrace:\n\tGetHandleVerifier [0x0x6b9d93+65891]\n\tGetHandleVerifier [0x0x6b9dd4+65956]\n\t(No symbol) [0x0x4cdca8]\n\t(No symbol) [0x0x509925]\n\t(No symbol) [0x0x508899]\n\t(No symbol) [0x0x4febaf]\n\t(No symbol) [0x0x4fe9d6]\n\t(No symbol) [0x0x547003]\n\t(No symbol) [0x0x5468fa]\n\t(No symbol) [0x0x53b076]\n\t(No symbol) [0x0x50c37a]\n\t(No symbol) [0x0x50d224]\n\tGetHandleVerifier [0x0x927e23+2613747]\n\tGetHandleVerifier [0x0x922f5a+2593578]\n\tGetHandleVerifier [0x0x6e1ac4+229012]\n\tGetHandleVerifier [0x0x6d1e58+164392]\n\tGetHandleVerifier [0x0x6d880d+191453]\n\tGetHandleVerifier [0x0x6c2148+99608]\n\tGetHandleVerifier [0x0x6c22e0+100016]\n\tGetHandleVerifier [0x0x6ac4ca+10394]\n\tBaseThreadInitThunk [0x0x75555d49+25]\n\tRtlInitializeExceptionChain [0x0x76ffd6db+107]\n\tRtlGetAppContainerNamedObjectPath [0x0x76ffd661+561]\n",
+                    "strategy_used": null
+                },
+                "Town of Queen Creek": {
+                    "rfq_count": 0,
+                    "status": "error",
+                    "error": "Message: session not created: cannot connect to chrome at 127.0.0.1:58537\nfrom session not created: This version of ChromeDriver only supports Chrome version 141\nCurrent browser version is 140.0.7339.210; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#sessionnotcreatedexception\nStacktrace:\n\tGetHandleVerifier [0x0x4b9d93+65891]\n\tGetHandleVerifier [0x0x4b9dd4+65956]\n\t(No symbol) [0x0x2cdca8]\n\t(No symbol) [0x0x309925]\n\t(No symbol) [0x0x308899]\n\t(No symbol) [0x0x2febaf]\n\t(No symbol) [0x0x2fe9d6]\n\t(No symbol) [0x0x347003]\n\t(No symbol) [0x0x3468fa]\n\t(No symbol) [0x0x33b076]\n\t(No symbol) [0x0x30c37a]\n\t(No symbol) [0x0x30d224]\n\tGetHandleVerifier [0x0x727e23+2613747]\n\tGetHandleVerifier [0x0x722f5a+2593578]\n\tGetHandleVerifier [0x0x4e1ac4+229012]\n\tGetHandleVerifier [0x0x4d1e58+164392]\n\tGetHandleVerifier [0x0x4d880d+191453]\n\tGetHandleVerifier [0x0x4c2148+99608]\n\tGetHandleVerifier [0x0x4c22e0+100016]\n\tGetHandleVerifier [0x0x4ac4ca+10394]\n\tBaseThreadInitThunk [0x0x75555d49+25]\n\tRtlInitializeExceptionChain [0x0x76ffd6db+107]\n\tRtlGetAppContainerNamedObjectPath [0x0x76ffd661+561]\n",
+                    "strategy_used": null
+                }
+            },
+            "total_rfqs": 45,
+            "alerts": [
+                {
+                    "city": "Town of Florence",
+                    "severity": "error",
+                    "message": "Scrape failed (previously got 0 RFQs)"
+                },
+                {
+                    "city": "Town of Queen Creek",
+                    "severity": "error",
+                    "message": "Scrape failed (previously got 0 RFQs)"
+                }
+            ]
+        },
+        {
+            "timestamp": "2025-10-02T22:12:35.233811",
+            "cities": {
+                "City of Gilbert": {
+                    "rfq_count": 30,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Mesa": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Apache Junction": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Yuma": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pinal County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Florence": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "Town of Queen Creek": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                }
+            },
+            "total_rfqs": 47,
+            "alerts": []
         }
     ]
 }

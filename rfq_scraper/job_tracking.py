@@ -20,10 +20,21 @@ class RFQJobTracker:
         cursor = conn.cursor()
         
         # Jobs table - permanent record of all RFQs
+        # Check if we need to migrate the old table
+        cursor.execute("""
+            SELECT name FROM sqlite_master 
+            WHERE type='table' AND name='jobs'
+        """)
+        if cursor.fetchone():
+            # Table exists, check if it has the old constraint
+            cursor.execute("PRAGMA table_info(jobs)")
+            # If table exists, we'll handle updates via ON CONFLICT
+            pass
+        
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS jobs (
                 job_id TEXT PRIMARY KEY,
-                rfq_number TEXT,
+                rfp_number TEXT,
                 organization TEXT,
                 title TEXT,
                 due_date TEXT,
@@ -34,7 +45,7 @@ class RFQJobTracker:
                 work_type TEXT,
                 user_status TEXT DEFAULT 'new',
                 user_notes TEXT,
-                UNIQUE(organization, rfq_number, title)
+                UNIQUE(organization, rfp_number)
             )
         """)
         
@@ -116,10 +127,10 @@ class RFQJobTracker:
                 job['user_notes'] = existing[2]
                 job['first_seen'] = existing[3]
             else:
-                # New job - insert
+                # New job - insert (use INSERT OR IGNORE to handle duplicates in same scrape)
                 cursor.execute("""
-                    INSERT INTO jobs (
-                        job_id, rfq_number, organization, title,
+                    INSERT OR IGNORE INTO jobs (
+                        job_id, rfp_number, organization, title,
                         due_date, link, first_seen, last_seen,
                         status, work_type, user_status
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new')
@@ -130,9 +141,28 @@ class RFQJobTracker:
                 ))
                 
                 job['job_id'] = job_id
-                job['user_status'] = 'new'
-                job['user_notes'] = None
-                job['first_seen'] = today
+                
+                # If INSERT was ignored (duplicate), fetch the existing record
+                if cursor.rowcount == 0:
+                    cursor.execute("""
+                        SELECT user_status, user_notes, first_seen
+                        FROM jobs WHERE job_id = ?
+                    """, (job_id,))
+                    existing = cursor.fetchone()
+                    if existing:
+                        job['user_status'] = existing[0]
+                        job['user_notes'] = existing[1]
+                        job['first_seen'] = existing[2]
+                    else:
+                        # Shouldn't happen, but handle it
+                        job['user_status'] = 'new'
+                        job['user_notes'] = None
+                        job['first_seen'] = today
+                else:
+                    # New insert succeeded
+                    job['user_status'] = 'new'
+                    job['user_notes'] = None
+                    job['first_seen'] = today
             
             enhanced_data.append(job)
         
