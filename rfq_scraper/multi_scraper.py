@@ -8,6 +8,7 @@ import json
 from datetime import date
 import time
 import os
+import argparse
 from PIL import Image
 import pytesseract
 import cv2
@@ -15,6 +16,13 @@ import re
 from scraper_health import ScraperHealthMonitor
 from scraper_strategies import ScraperStrategy
 from job_tracking import RFQJobTracker
+from scraper_checkpoint import ScraperCheckpoint
+
+# Parse command line arguments
+parser = argparse.ArgumentParser(description='RFQ Scraper with checkpoint support')
+parser.add_argument('--resume', action='store_true', help='Resume from last checkpoint')
+parser.add_argument('--fresh', action='store_true', help='Start fresh, ignore checkpoint')
+args = parser.parse_args()
 
 # Set Tesseract path
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -22,6 +30,22 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 # Load cities
 with open("cities.json", "r") as f:
     sites = json.load(f)
+
+# Initialize checkpoint system
+checkpoint = ScraperCheckpoint()
+
+# Handle checkpoint flags
+if args.fresh:
+    checkpoint.reset()
+elif args.resume:
+    resume_info = checkpoint.get_resume_info()
+    if resume_info["should_resume"]:
+        print(f"\n📍 RESUMING from checkpoint:")
+        print(f"   Last completed: {resume_info['last_city']}")
+        print(f"   Starting from city #{resume_info['resume_from_index'] + 1}")
+        print(f"   Timestamp: {resume_info['timestamp']}\n")
+    else:
+        print("No checkpoint found - starting fresh")
 
 # Initialize health monitor and job tracker
 health_monitor = ScraperHealthMonitor()
@@ -74,6 +98,12 @@ for site_idx, site in enumerate(sites):
     rfq_count_for_city = 0
     strategy_used = None
     scrape_error = None
+    city_data = []  # Store this city's RFQs separately
+
+    # Check if we should skip this city (checkpoint)
+    if checkpoint.should_skip_city(site_idx, org):
+        print(f"⏭️  Skipping {org} (already completed in this run)")
+        continue
 
     if manual:
         print(f"Scraping {org} (manual CAPTCHA required)...")
@@ -309,7 +339,7 @@ for site_idx, site in enumerate(sites):
                     continue  # Skip duplicate
                 seen_titles.add(title)
                 
-                data.append({
+                city_data.append({
                     "organization": org,
                     "rfp_number": rfp_number,
                     "title": title,
@@ -416,7 +446,7 @@ for site_idx, site in enumerate(sites):
                     work_type = "utility/transportation"
                 elif any(word in title_lower for word in ["landscaping", "maintenance"]):
                     work_type = "maintenance"
-                data.append({
+                city_data.append({
                     "organization": org,
                     "rfp_number": rfp_number.strip(),
                     "title": title.strip(),
@@ -439,15 +469,28 @@ for site_idx, site in enumerate(sites):
             pass
         driver = create_driver()
         time.sleep(1)
+    
+    # Process and save this city's data immediately
+    if city_data:
+        print(f"💾 Saving {len(city_data)} RFQs for {org} to database...")
+        enhanced_city_data = job_tracker.process_scraped_jobs(city_data)
+        data.extend(enhanced_city_data)  # Add to global list
+        
+        # Save updated rfqs.json after each city
+        with open("rfqs.json", "w") as f:
+            json.dump(data, f, indent=4)
+        
+        print(f"✅ {org}: {len(city_data)} RFQs saved and checkpoint marked")
+    
+    # Mark checkpoint after each city (success or failure)
+    checkpoint.mark_city_complete(site_idx, org, rfq_count_for_city)
 
-# Process jobs through tracking system (assigns IDs, preserves user decisions)
-print(f"\n📊 Processing {len(data)} scraped jobs through tracking system...")
-enhanced_data = job_tracker.process_scraped_jobs(data)
+# Final processing - already done incrementally above
+print(f"\n📊 Total: {len(data)} RFQs from all cities")
+# Note: Data already saved incrementally after each city
 
-# Save enhanced data with job IDs
-with open("rfqs.json", "w") as f:
-    json.dump(enhanced_data, f, indent=4)
-print(f"✅ Saved {len(enhanced_data)} RFQs with job tracking to rfqs.json")
+# Mark scrape as complete
+checkpoint.mark_complete()
 
 # Show job tracking stats
 tracking_stats = job_tracker.get_stats()

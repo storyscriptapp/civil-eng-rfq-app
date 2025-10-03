@@ -83,15 +83,30 @@ npm install
 ```bash
 cd rfq_scraper
 venv\Scripts\activate  # Windows
+
+# Normal run (default)
 python multi_scraper.py
+
+# Resume from last checkpoint (if scraper crashed)
+python multi_scraper.py --resume
+
+# Start fresh (ignore checkpoint)
+python multi_scraper.py --fresh
 ```
 
+**Checkpoint System:**
+- Saves progress after EACH city
+- If scraper crashes, use `--resume` to continue from last completed city
+- Data saved to database incrementally (not lost if crash occurs)
+- Checkpoint stored in `scraper_checkpoint.json`
+
 **Output:**
-- `rfqs.json` - Latest scraped RFQs with job tracking
-- `rfq_tracking.db` - SQLite database with user decisions and history
+- `rfqs.json` - Latest scraped RFQs with job tracking (updated after each city)
+- `rfq_tracking.db` - SQLite database (updated incrementally)
+- `scraper_checkpoint.json` - Resume point if scraper crashes
 - `scraper_history.json` - Performance metrics over time
 
-**Typical runtime:** 3-5 minutes for all 7 cities
+**Typical runtime:** 3-5 minutes for 7 cities (40 seconds per city)
 
 ### Running the Web App
 
