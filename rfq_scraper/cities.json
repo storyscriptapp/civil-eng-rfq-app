@@ -32,7 +32,9 @@
         "row_selector": "table tbody tr",
         "cell_count": 2,
         "is_dynamic": true,
-        "manual": false
+        "manual": false,
+        "has_pagination": true,
+        "pagination_selector": ".pagination a, a[aria-label*='Next'], button[aria-label*='Next']"
     },
     {
         "organization": "Pinal County",
@@ -40,7 +42,9 @@
         "row_selector": "table tbody tr",
         "cell_count": 2,
         "is_dynamic": true,
-        "manual": false
+        "manual": false,
+        "has_pagination": true,
+        "pagination_selector": ".pagination a, a[aria-label*='Next'], button[aria-label*='Next']"
     },
     {
         "organization": "Town of Florence",
