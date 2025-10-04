@@ -59,12 +59,32 @@ function CitiesList({ onCitySelect, onBack }) {
     }
   };
 
-  const handleScrapeSelected = () => {
+  const handleScrapeSelected = async () => {
     if (selectedCities.size === 0) {
       alert('Please select at least one city to scrape');
       return;
     }
-    alert(`Would scrape ${selectedCities.size} cities:\n${[...selectedCities].join(', ')}\n\n(Scraping functionality coming soon!)`);
+
+    const citiesList = [...selectedCities];
+    const confirmed = window.confirm(
+      `Start scraping ${citiesList.length} cities?\n\n${citiesList.join('\n')}\n\nA new terminal window will open showing progress.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch('http://localhost:8000/run_scraper', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cities: citiesList })
+      });
+
+      const data = await response.json();
+      alert(`✅ Scraper started for ${citiesList.length} cities!\n\nCheck the terminal window for progress.`);
+    } catch (error) {
+      console.error('Error starting scraper:', error);
+      alert('❌ Error starting scraper. Make sure the API server is running.');
+    }
   };
 
   if (loading) {

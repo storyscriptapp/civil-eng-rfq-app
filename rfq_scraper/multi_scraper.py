@@ -22,6 +22,7 @@ from scraper_checkpoint import ScraperCheckpoint
 parser = argparse.ArgumentParser(description='RFQ Scraper with checkpoint support')
 parser.add_argument('--resume', action='store_true', help='Resume from last checkpoint')
 parser.add_argument('--fresh', action='store_true', help='Start fresh, ignore checkpoint')
+parser.add_argument('--cities', type=str, help='Comma-separated list of city names to scrape')
 args = parser.parse_args()
 
 # Set Tesseract path
@@ -30,6 +31,15 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 # Load cities
 with open("cities.json", "r") as f:
     sites = json.load(f)
+
+# Filter cities if --cities argument provided
+if args.cities:
+    selected_city_names = [name.strip() for name in args.cities.split(',')]
+    sites = [city for city in sites if city['organization'] in selected_city_names]
+    print(f"\n{'='*60}")
+    print(f"Scraping SELECTED cities: {len(sites)}")
+    print(f"Cities: {', '.join([c['organization'] for c in sites])}")
+    print(f"{'='*60}\n")
 
 # Initialize checkpoint system
 checkpoint = ScraperCheckpoint()

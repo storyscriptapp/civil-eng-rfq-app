@@ -36,9 +36,25 @@ async def get_rfqs():
         return []
 
 @app.post("/run_scraper")
-async def run_scraper():
-    subprocess.run(["python", os.path.join(os.path.dirname(__file__), "multi_scraper.py")])
-    return {"status": "Scraper started"}
+async def run_scraper(data: dict = None):
+    """Run scraper for all cities or selected cities"""
+    script_path = os.path.join(os.path.dirname(__file__), "multi_scraper.py")
+    
+    if data and data.get("cities"):
+        # Run scraper for selected cities
+        cities_str = ",".join(data["cities"])
+        subprocess.Popen(
+            ["python", script_path, "--cities", cities_str],
+            creationflags=subprocess.CREATE_NEW_CONSOLE if os.name == 'nt' else 0
+        )
+        return {"status": "Scraper started for selected cities", "cities": data["cities"]}
+    else:
+        # Run scraper for all cities
+        subprocess.Popen(
+            ["python", script_path],
+            creationflags=subprocess.CREATE_NEW_CONSOLE if os.name == 'nt' else 0
+        )
+        return {"status": "Scraper started for all cities"}
 
 @app.post("/save_cities")
 async def save_cities(cities: list):
