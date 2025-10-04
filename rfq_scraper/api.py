@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 import os
@@ -11,6 +11,7 @@ import pytesseract
 import cv2
 import numpy as np
 from job_tracking import RFQJobTracker
+from auth import get_current_username
 
 app = FastAPI()
 
@@ -57,8 +58,8 @@ async def get_health():
         }
 
 @app.post("/run_scraper")
-async def run_scraper(data: dict = None):
-    """Run scraper for all cities or selected cities"""
+async def run_scraper(data: dict = None, username: str = Depends(get_current_username)):
+    """Run scraper for all cities or selected cities (requires authentication)"""
     script_dir = os.path.dirname(__file__)
     script_path = os.path.join(script_dir, "multi_scraper.py")
     
@@ -111,7 +112,7 @@ async def save_cities(cities: list):
     return {"status": "Cities saved"}
 
 @app.post("/update_job_status")
-async def update_job_status(data: dict):
+async def update_job_status(data: dict, username: str = Depends(get_current_username)):
     job_id = data.get("job_id")
     status = data.get("status")
     notes = data.get("notes")
@@ -146,7 +147,7 @@ async def update_job_status(data: dict):
         return {"error": str(e)}
 
 @app.post("/update_work_type")
-async def update_work_type(data: dict):
+async def update_work_type(data: dict, username: str = Depends(get_current_username)):
     job_id = data.get("job_id")
     work_type = data.get("work_type")
     
@@ -255,7 +256,7 @@ async def get_job_details(job_id: str):
     }
 
 @app.post("/update_job_details")
-async def update_job_details(data: dict):
+async def update_job_details(data: dict, username: str = Depends(get_current_username)):
     """Update job title and other editable fields"""
     job_id = data.get("job_id")
     title = data.get("title")

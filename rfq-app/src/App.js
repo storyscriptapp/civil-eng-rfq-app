@@ -4,8 +4,10 @@ import './App.css';
 import JobDetails from './JobDetails';
 import CitiesList from './CitiesList';
 import CityProfile from './CityProfile';
+import Login from './Login';
 
 function App() {
+    const [auth, setAuth] = useState(localStorage.getItem('auth') || null);
     const [rfqs, setRfqs] = useState([]);
     const [cities, setCities] = useState([]);
     const [newCity, setNewCity] = useState({ organization: '', url: '', row_selector: '', cell_count: 4, is_dynamic: false, manual: false });
@@ -63,10 +65,20 @@ function App() {
     };
 
     const runScraper = () => {
-        fetch('http://localhost:8000/run_scraper', { method: 'POST' })
+        fetch('http://localhost:8000/run_scraper', { 
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${auth}`
+            }
+        })
             .then(res => res.json())
             .then(data => console.log('Scraper:', data))
             .catch(err => console.error('Error running scraper:', err));
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('auth');
+        setAuth(null);
     };
 
     const parseText = () => {
@@ -102,7 +114,10 @@ function App() {
     const updateUserStatus = (jobId, status, notes = null) => {
         fetch('http://localhost:8000/update_job_status', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${auth}`
+            },
             body: JSON.stringify({ job_id: jobId, status, notes })
         })
             .then(res => res.json())
@@ -189,6 +204,11 @@ function App() {
         }} />;
     }
 
+    // Show login screen if not authenticated
+    if (!auth) {
+        return <Login onLogin={setAuth} />;
+    }
+
     // If viewing cities list
     if (currentView === 'cities') {
         return (
@@ -214,7 +234,7 @@ function App() {
         <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h1>RFQ Tracker</h1>
-                <div className="d-flex gap-2">
+                <div className="d-flex gap-2 align-items-center">
                     <button 
                         onClick={() => setCurrentView('cities')} 
                         className="btn btn-info"
@@ -223,6 +243,9 @@ function App() {
                     </button>
                     <button className="btn btn-primary" onClick={runScraper}>
                         <i className="bi bi-arrow-clockwise"></i> Run Scraper
+                    </button>
+                    <button className="btn btn-outline-secondary" onClick={handleLogout} title="Logout">
+                        🚪 Logout
                     </button>
                 </div>
             </div>
