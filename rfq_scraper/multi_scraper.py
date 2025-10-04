@@ -316,10 +316,36 @@ for site_idx, site in enumerate(sites):
                     continue
 
                 try:
-                    # Bonfire sites (Yuma, Pinal) have different structure
+                    # BidNet Direct sites (Maricopa, Pima) have single-cell structure with nested divs
+                    is_bidnet_direct = "bidnetdirect" in url.lower()
                     is_bonfire = "bonfire" in url.lower()
                     
-                    if is_bonfire:
+                    if is_bidnet_direct and cell_count == 1:
+                        # BidNet Direct: All data in one cell with nested divs
+                        # .sol-num = RFP number, .sol-title a = title/link, .date-value = dates
+                        try:
+                            rfp_number = cells[0].find_element(By.CSS_SELECTOR, ".sol-num").text.strip()
+                        except:
+                            rfp_number = "N/A"
+                        
+                        try:
+                            title_elem = cells[0].find_element(By.CSS_SELECTOR, ".sol-title a")
+                            title = title_elem.text.strip()
+                            link = title_elem.get_attribute("href")
+                        except:
+                            pass  # Already extracted above
+                        
+                        try:
+                            date_values = cells[0].find_elements(By.CSS_SELECTOR, ".date-value")
+                            due_date = date_values[1].text.strip() if len(date_values) > 1 else "N/A"
+                        except:
+                            due_date = "N/A"
+                        
+                        documents = []
+                        status = "Open"
+                        print(f"✅ BidNet Direct: {rfp_number} - {title[:50]}...")
+                        
+                    elif is_bonfire:
                         # Bonfire structure: cell[0]=Status, cell[1]=RFP#, cell[2]=Title, cell[3]=Due Date
                         if len(cells) >= 3:
                             status = cells[0].text.strip()
