@@ -182,10 +182,11 @@
     {
         "organization": "City of Tempe",
         "url": "https://www.tempe.gov/government/public-works/engineering/current-bids-rfqs",
-        "row_selector": "div.row, .item",
-        "cell_count": 4,
+        "row_selector": "div.fr-view ul li, div.fr-view p, article",
+        "cell_count": 1,
         "is_dynamic": false,
-        "manual": false
+        "manual": false,
+        "note": "Uses list format, not table"
     },
     {
         "organization": "City of Peoria",
@@ -218,10 +219,11 @@
     {
         "organization": "City of Prescott",
         "url": "https://prescott-az.gov/budget-and-finance/purchasing/",
-        "row_selector": "table tbody tr",
-        "cell_count": 4,
+        "row_selector": "div.wpb_wrapper, article.post, div.entry-content",
+        "cell_count": 1,
         "is_dynamic": false,
-        "manual": false
+        "manual": false,
+        "note": "May use WordPress page layout, not table"
     },
     {
         "organization": "City of Casa Grande",

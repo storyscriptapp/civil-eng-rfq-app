@@ -183,7 +183,12 @@ for site_idx, site in enumerate(sites):
                 iframe = wait.until(EC.presence_of_element_located((By.TAG_NAME, "iframe")))
                 driver.switch_to.frame(iframe)
                 print(f"✅ Switched to iframe for {org}")
-                time.sleep(2)  # Give iframe content time to load
+                # BidNet sites need more time for dynamic content
+                if 'bidnet' in url.lower():
+                    print(f"⏳ BidNet detected - waiting for dynamic table...")
+                    time.sleep(8)
+                else:
+                    time.sleep(2)  # Give iframe content time to load
             except:
                 print(f"⚠️ No iframe found for {org}, continuing without iframe")
 
