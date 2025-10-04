@@ -69,18 +69,20 @@
     {
         "organization": "Maricopa County",
         "url": "https://www.bidnetdirect.com/arizona/maricopacounty",
-        "row_selector": "table tbody tr",
+        "row_selector": "table.table tbody tr, .solicitation-row, .bid-row, table tr",
         "cell_count": 5,
         "is_dynamic": true,
-        "manual": false
+        "manual": false,
+        "note": "BidNet uses iframe with dynamic table loading"
     },
     {
         "organization": "Pima County",
         "url": "https://www.bidnetdirect.com/arizona/pimacounty",
-        "row_selector": "table tbody tr",
+        "row_selector": "table.table tbody tr, .solicitation-row, .bid-row, table tr",
         "cell_count": 5,
         "is_dynamic": true,
-        "manual": false
+        "manual": false,
+        "note": "BidNet uses iframe with dynamic table loading"
     },
     {
         "organization": "Yavapai County",
@@ -181,12 +183,13 @@
     },
     {
         "organization": "City of Tempe",
-        "url": "https://www.tempe.gov/government/public-works/engineering/current-bids-rfqs",
-        "row_selector": "div.fr-view ul li, div.fr-view p, article",
-        "cell_count": 1,
-        "is_dynamic": false,
+        "url": "https://tempe-gov.bonfirehub.com/portal/?tab=openOpportunities",
+        "row_selector": "table tbody tr",
+        "cell_count": 3,
+        "is_dynamic": true,
         "manual": false,
-        "note": "Uses list format, not table"
+        "has_pagination": true,
+        "pagination_selector": ".pagination a, a[aria-label*='Next'], button[aria-label*='Next']"
     },
     {
         "organization": "City of Peoria",
@@ -218,12 +221,13 @@
     },
     {
         "organization": "City of Prescott",
-        "url": "https://prescott-az.gov/budget-and-finance/purchasing/",
-        "row_selector": "div.wpb_wrapper, article.post, div.entry-content",
-        "cell_count": 1,
-        "is_dynamic": false,
+        "url": "https://procurement.opengov.com/portal/prescott-az",
+        "row_selector": "div.row, .item",
+        "cell_count": 75,
+        "is_dynamic": true,
         "manual": false,
-        "note": "May use WordPress page layout, not table"
+        "uses_cloudflare": true,
+        "strategy_name": "div_rows"
     },
     {
         "organization": "City of Casa Grande",
