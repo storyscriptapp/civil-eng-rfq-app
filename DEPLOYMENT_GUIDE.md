@@ -143,43 +143,122 @@ python -m uvicorn api:app --host 0.0.0.0 --port 8000
 
 ## 🌐 Part 2: Set Up Cloudflare Tunnel (30 minutes)
 
+**IMPORTANT:** You have **TWO options** here:
+- **Option A: Free Cloudflare URL** ⭐ **RECOMMENDED** - No domain needed!
+- **Option B: Your Own Domain** - Costs ~$10/year
+
+**I recommend Option A to start!** You can always upgrade to Option B later.
+
+---
+
 ### Step 2.1: Create Cloudflare Account
 
 1. Go to https://dash.cloudflare.com/sign-up
-2. Create free account
-3. Add your domain (if you have one)
-   - If you don't have a domain, you can use Cloudflare's free subdomain
+2. Create **free account** (no credit card needed)
+3. Verify your email
 
 ---
 
-### Step 2.2: Install Cloudflare Tunnel
+### Step 2.2: Set Up Zero Trust (Free)
 
-1. Go to **Zero Trust** in Cloudflare dashboard
-2. Click **Access** → **Tunnels**
-3. Click **Create a tunnel**
-4. Name it: `rfq-tracker`
-5. Click **Save tunnel**
+1. In Cloudflare dashboard, click **Zero Trust** in the left menu
+2. If prompted to set up Zero Trust:
+   - Choose a **team name** (e.g., "rfq-tracker" or "yourname-team")
+   - Select the **free plan** (no credit card needed)
+   - Click **Continue**
 
-6. **Install connector on your server:**
+---
+
+### Step 2.3: Create Tunnel
+
+1. Click **Access** → **Tunnels** in the left menu
+2. Click **Create a tunnel**
+3. Name it: `rfq-tracker`
+4. Click **Save tunnel**
+
+5. **Install connector on your server:**
    - Cloudflare will show a command like:
    ```powershell
-   cloudflared.exe service install [YOUR-TOKEN]
+   cloudflared.exe service install eyJhIjoiYWJjMTIz...
    ```
-   - Copy and run this in PowerShell **as Administrator**
+   - **Copy the ENTIRE command**
+   - Open PowerShell **as Administrator** on your server
+   - Paste and run the command
+   - Wait for it to say "Tunnel started successfully"
 
 ---
 
-### Step 2.3: Configure Public Hostname
+### Step 2.4A: Configure Public Hostname (FREE URL) ⭐ **RECOMMENDED**
 
-1. In the tunnel configuration, add a **Public Hostname**:
-   - **Subdomain:** `rfq` (or whatever you like)
-   - **Domain:** `yourdomain.com`
+**This gives you a FREE URL with no domain purchase needed!**
+
+1. In the tunnel configuration, click **Public Hostname** tab
+2. Click **Add a public hostname**
+3. Fill in:
+   - **Subdomain:** `rfq-tracker` (or any name you want)
+   - **Domain:** Select the **`.trycloudflare.com`** option from dropdown
+   - **Path:** Leave blank
    - **Service:**
      - Type: `HTTP`
      - URL: `localhost:8000`
-2. Click **Save hostname**
+4. Click **Save hostname**
 
-**Your app will now be accessible at:** `https://rfq.yourdomain.com`
+**✅ DONE!** Your app is now accessible at:
+```
+https://rfq-tracker.trycloudflare.com
+```
+(Replace `rfq-tracker` with whatever subdomain you chose)
+
+**Bookmark this URL!** This is what you'll use to access your app from anywhere.
+
+---
+
+### Step 2.4B: Configure Public Hostname (CUSTOM DOMAIN) - Optional
+
+**Only do this if you own a domain (like yourcompany.com)**
+
+1. First, add your domain to Cloudflare:
+   - Go to Cloudflare main dashboard
+   - Click **Add site**
+   - Enter your domain name (e.g., `yourcompany.com`)
+   - Follow the steps to change your nameservers
+   - Wait for DNS to propagate (5-30 minutes)
+
+2. Back in the tunnel configuration, click **Public Hostname** tab
+3. Click **Add a public hostname**
+4. Fill in:
+   - **Subdomain:** `rfq`
+   - **Domain:** Select your domain from dropdown (e.g., `yourcompany.com`)
+   - **Path:** Leave blank
+   - **Service:**
+     - Type: `HTTP`
+     - URL: `localhost:8000`
+5. Click **Save hostname**
+
+**✅ DONE!** Your app is now accessible at:
+```
+https://rfq.yourcompany.com
+```
+
+---
+
+### Step 2.5: Test Your Connection
+
+**From your laptop (or any device):**
+
+1. Open a web browser
+2. Go to your URL:
+   - **Option A:** `https://rfq-tracker.trycloudflare.com` (your free URL)
+   - **Option B:** `https://rfq.yourcompany.com` (if you used your domain)
+3. You should see the **login screen**!
+4. Enter your username and password from Step 1.4
+
+**If it works, congratulations!** 🎉 Your app is now live on the internet!
+
+**If it doesn't work:**
+- Check the API is running on the server: `http://localhost:8000/rfqs`
+- Check Cloudflare tunnel status: `cloudflared service status`
+- Make sure port 8000 isn't blocked by Windows Firewall
 
 ---
 
@@ -269,8 +348,10 @@ Write-Host "Backup completed: $backupDir"
 ## 🎉 Part 5: Access Your App!
 
 ### From anywhere:
-1. Go to: `https://rfq.yourdomain.com`
-2. Enter username and password
+1. Go to your URL:
+   - **Free URL:** `https://rfq-tracker.trycloudflare.com` (or whatever you named it)
+   - **Custom domain:** `https://rfq.yourcompany.com` (if you set one up)
+2. Enter your username and password
 3. Start tracking RFQs!
 
 ### Security Features Enabled:
@@ -281,12 +362,17 @@ Write-Host "Backup completed: $backupDir"
 - ✅ Hidden from internet scanners
 - ✅ Rate limiting (3 failed login attempts = temporary block)
 
+**💡 Pro Tip:** Bookmark your URL on all devices (work PC, phone, home PC) for easy access!
+
 ---
 
 ## 📱 Part 6: Mobile Access (Bonus)
 
 Your app is now mobile-friendly! Just visit the same URL on your phone:
-- `https://rfq.yourdomain.com`
+- **Free URL:** `https://rfq-tracker.trycloudflare.com`
+- **Custom domain:** `https://rfq.yourcompany.com`
+
+Works on iOS, Android, tablets - any device with a web browser!
 
 ---
 
