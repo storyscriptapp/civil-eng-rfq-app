@@ -68,18 +68,18 @@
     },
     {
         "organization": "Maricopa County",
-        "url": "https://www.maricopa.gov/2190/Solicitations",
+        "url": "https://www.bidnetdirect.com/arizona/maricopacounty",
         "row_selector": "table tbody tr",
-        "cell_count": 4,
-        "is_dynamic": false,
+        "cell_count": 5,
+        "is_dynamic": true,
         "manual": false
     },
     {
         "organization": "Pima County",
-        "url": "https://www.pima.gov/199/Solicitations",
+        "url": "https://www.bidnetdirect.com/arizona/pimacounty",
         "row_selector": "table tbody tr",
-        "cell_count": 4,
-        "is_dynamic": false,
+        "cell_count": 5,
+        "is_dynamic": true,
         "manual": false
     },
     {
@@ -93,10 +93,11 @@
     {
         "organization": "Coconino County",
         "url": "https://www.coconino.az.gov/Bids.aspx",
-        "row_selector": "table tbody tr",
-        "cell_count": 4,
+        "row_selector": "div.row, .item",
+        "cell_count": 31,
         "is_dynamic": false,
-        "manual": false
+        "manual": false,
+        "strategy_name": "div_rows"
     },
     {
         "organization": "Gila County",
@@ -117,10 +118,11 @@
     {
         "organization": "Graham County",
         "url": "https://www.graham.az.gov/Bids.aspx",
-        "row_selector": "table tbody tr",
-        "cell_count": 4,
+        "row_selector": "div.row, .item",
+        "cell_count": 5,
         "is_dynamic": false,
-        "manual": false
+        "manual": false,
+        "strategy_name": "div_rows"
     },
     {
         "organization": "Yuma County",
@@ -129,5 +131,103 @@
         "cell_count": 4,
         "is_dynamic": false,
         "manual": false
+    },
+    {
+        "organization": "City of Phoenix",
+        "url": "https://solicitations.phoenix.gov/",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": true,
+        "manual": false
+    },
+    {
+        "organization": "City of Tucson",
+        "url": "https://procurement.opengov.com/portal/tucson-az",
+        "row_selector": "div.row, .item",
+        "cell_count": 75,
+        "is_dynamic": true,
+        "manual": false,
+        "uses_cloudflare": true,
+        "strategy_name": "div_rows"
+    },
+    {
+        "organization": "City of Chandler",
+        "url": "https://www.chandleraz.gov/business/vendor-services/purchasing/requests-for-bids-and-proposals",
+        "row_selector": "div.row, .item",
+        "cell_count": 37,
+        "is_dynamic": false,
+        "manual": false,
+        "strategy_name": "div_rows"
+    },
+    {
+        "organization": "City of Scottsdale",
+        "url": "https://scottsdaleaz.bonfirehub.com/portal/?tab=openOpportunities",
+        "row_selector": "table tbody tr",
+        "cell_count": 3,
+        "is_dynamic": true,
+        "manual": false,
+        "has_pagination": true,
+        "pagination_selector": ".pagination a, a[aria-label*='Next'], button[aria-label*='Next']"
+    },
+    {
+        "organization": "City of Glendale",
+        "url": "https://glendaleazvendors.munisselfservice.com/Vendors/VBids/Default.aspx",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": true,
+        "manual": false
+    },
+    {
+        "organization": "City of Tempe",
+        "url": "https://www.tempe.gov/government/public-works/engineering/current-bids-rfqs",
+        "row_selector": "div.row, .item",
+        "cell_count": 4,
+        "is_dynamic": false,
+        "manual": false
+    },
+    {
+        "organization": "City of Peoria",
+        "url": "https://peoriaaz.bonfirehub.com/portal/?tab=openOpportunities",
+        "row_selector": "table tbody tr",
+        "cell_count": 3,
+        "is_dynamic": true,
+        "manual": false,
+        "has_pagination": true,
+        "pagination_selector": ".pagination a, a[aria-label*='Next'], button[aria-label*='Next']"
+    },
+    {
+        "organization": "City of Surprise",
+        "url": "https://surpriseaz.gov/277/Procurement",
+        "row_selector": "div.row, .item",
+        "cell_count": 15,
+        "is_dynamic": false,
+        "manual": false,
+        "strategy_name": "div_rows",
+        "note": "May have outdated data - last update appears to be 2018 bonds"
+    },
+    {
+        "organization": "City of Flagstaff",
+        "url": "https://vendors.planetbids.com/portal/27606/bo/bo-search",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": true,
+        "manual": false
+    },
+    {
+        "organization": "City of Prescott",
+        "url": "https://prescott-az.gov/budget-and-finance/purchasing/",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": false,
+        "manual": false
+    },
+    {
+        "organization": "City of Casa Grande",
+        "url": "https://casagrandeaz.gov/Bids.aspx",
+        "row_selector": "div.row, .item",
+        "cell_count": 5,
+        "is_dynamic": false,
+        "manual": false,
+        "strategy_name": "div_rows"
     }
 ]
