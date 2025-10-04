@@ -194,6 +194,10 @@ for site_idx, site in enumerate(sites):
                 print(f"⚠️ No iframe found for {org}, continuing without iframe")
         elif is_dynamic and not uses_iframe:
             print(f"⏭️  Skipping iframe for {org} (uses_iframe=false)")
+            # BidNet Direct needs time to load dynamic content even without iframe
+            if 'bidnetdirect' in url.lower():
+                print(f"⏳ BidNet Direct detected - waiting for dynamic content...")
+                time.sleep(5)
 
         # Pagination loop
         page_num = 1

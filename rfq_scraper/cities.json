@@ -69,22 +69,24 @@
     {
         "organization": "Maricopa County",
         "url": "https://www.bidnetdirect.com/arizona/maricopacounty",
-        "row_selector": "tr.mets-table-row",
+        "row_selector": "table.sol-table tbody tr.mets-table-row",
         "cell_count": 1,
         "is_dynamic": true,
         "manual": false,
         "note": "BidNet Direct - table in main page, not iframe. Each row is one cell with nested divs.",
-        "uses_iframe": false
+        "uses_iframe": false,
+        "skip_wait": false
     },
     {
         "organization": "Pima County",
         "url": "https://www.bidnetdirect.com/arizona/pimacounty",
-        "row_selector": "tr.mets-table-row",
+        "row_selector": "table.sol-table tbody tr.mets-table-row",
         "cell_count": 1,
         "is_dynamic": true,
         "manual": false,
         "note": "BidNet Direct - table in main page, not iframe. Each row is one cell with nested divs.",
-        "uses_iframe": false
+        "uses_iframe": false,
+        "skip_wait": false
     },
     {
         "organization": "Yavapai County",
