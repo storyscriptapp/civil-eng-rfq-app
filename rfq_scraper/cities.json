@@ -65,5 +65,69 @@
         "manual": false,
         "uses_cloudflare": true,
         "strategy_name": "div_rows"
+    },
+    {
+        "organization": "Maricopa County",
+        "url": "https://www.maricopa.gov/2190/Solicitations",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": false,
+        "manual": false
+    },
+    {
+        "organization": "Pima County",
+        "url": "https://www.pima.gov/199/Solicitations",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": false,
+        "manual": false
+    },
+    {
+        "organization": "Yavapai County",
+        "url": "https://www.yavapaiaz.gov/County-Government/Bids",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": false,
+        "manual": false
+    },
+    {
+        "organization": "Coconino County",
+        "url": "https://www.coconino.az.gov/Bids.aspx",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": false,
+        "manual": false
+    },
+    {
+        "organization": "Gila County",
+        "url": "https://www.gilacountyaz.gov/government/finance/procurement/current_bids.php",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": false,
+        "manual": false
+    },
+    {
+        "organization": "Santa Cruz County",
+        "url": "https://www.santacruzcountyaz.gov/286/Bids-Solicitations",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": false,
+        "manual": false
+    },
+    {
+        "organization": "Graham County",
+        "url": "https://www.graham.az.gov/Bids.aspx",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": false,
+        "manual": false
+    },
+    {
+        "organization": "Yuma County",
+        "url": "https://www.yumacountyaz.gov/i-want-to/view-request-for-proposals",
+        "row_selector": "table tbody tr",
+        "cell_count": 4,
+        "is_dynamic": false,
+        "manual": false
     }
 ]
