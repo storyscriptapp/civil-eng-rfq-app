@@ -134,11 +134,13 @@
     },
     {
         "organization": "City of Phoenix",
-        "url": "https://solicitations.phoenix.gov/",
-        "row_selector": "table tbody tr",
-        "cell_count": 4,
+        "url": "https://procurement.opengov.com/portal/phoenix",
+        "row_selector": "div.row, .item",
+        "cell_count": 75,
         "is_dynamic": true,
-        "manual": false
+        "manual": false,
+        "uses_cloudflare": true,
+        "strategy_name": "div_rows"
     },
     {
         "organization": "City of Tucson",

@@ -38,22 +38,49 @@ async def get_rfqs():
 @app.post("/run_scraper")
 async def run_scraper(data: dict = None):
     """Run scraper for all cities or selected cities"""
-    script_path = os.path.join(os.path.dirname(__file__), "multi_scraper.py")
+    script_dir = os.path.dirname(__file__)
+    script_path = os.path.join(script_dir, "multi_scraper.py")
+    
+    # Get the Python executable from the current environment
+    python_exe = os.path.join(os.path.dirname(os.path.dirname(script_dir)), "venv", "Scripts", "python.exe")
+    if not os.path.exists(python_exe):
+        python_exe = "python"  # Fallback to system Python
     
     if data and data.get("cities"):
         # Run scraper for selected cities
         cities_str = ",".join(data["cities"])
-        subprocess.Popen(
-            ["python", script_path, "--cities", cities_str],
-            creationflags=subprocess.CREATE_NEW_CONSOLE if os.name == 'nt' else 0
-        )
+        if os.name == 'nt':
+            # Windows: create batch file that keeps window open on error
+            batch_content = f'@echo off\ncd /d "{script_dir}"\n"{python_exe}" multi_scraper.py --cities "{cities_str}"\necho.\necho Scraper finished. Press any key to close...\npause > nul'
+            batch_path = os.path.join(script_dir, "run_scraper_temp.bat")
+            with open(batch_path, 'w') as f:
+                f.write(batch_content)
+            subprocess.Popen(
+                ["cmd", "/c", "start", "cmd", "/k", batch_path],
+                cwd=script_dir
+            )
+        else:
+            subprocess.Popen(
+                [python_exe, script_path, "--cities", cities_str],
+                cwd=script_dir
+            )
         return {"status": "Scraper started for selected cities", "cities": data["cities"]}
     else:
         # Run scraper for all cities
-        subprocess.Popen(
-            ["python", script_path],
-            creationflags=subprocess.CREATE_NEW_CONSOLE if os.name == 'nt' else 0
-        )
+        if os.name == 'nt':
+            batch_content = f'@echo off\ncd /d "{script_dir}"\n"{python_exe}" multi_scraper.py\necho.\necho Scraper finished. Press any key to close...\npause > nul'
+            batch_path = os.path.join(script_dir, "run_scraper_temp.bat")
+            with open(batch_path, 'w') as f:
+                f.write(batch_content)
+            subprocess.Popen(
+                ["cmd", "/c", "start", "cmd", "/k", batch_path],
+                cwd=script_dir
+            )
+        else:
+            subprocess.Popen(
+                [python_exe, script_path],
+                cwd=script_dir
+            )
         return {"status": "Scraper started for all cities"}
 
 @app.post("/save_cities")
