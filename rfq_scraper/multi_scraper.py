@@ -177,8 +177,9 @@ for site_idx, site in enumerate(sites):
                 driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
 
-        # Handle iframes
-        if is_dynamic:
+        # Handle iframes (only if not explicitly disabled)
+        uses_iframe = site.get("uses_iframe", True)  # Default to True for backward compatibility
+        if is_dynamic and uses_iframe:
             try:
                 iframe = wait.until(EC.presence_of_element_located((By.TAG_NAME, "iframe")))
                 driver.switch_to.frame(iframe)
@@ -191,6 +192,8 @@ for site_idx, site in enumerate(sites):
                     time.sleep(2)  # Give iframe content time to load
             except:
                 print(f"⚠️ No iframe found for {org}, continuing without iframe")
+        elif is_dynamic and not uses_iframe:
+            print(f"⏭️  Skipping iframe for {org} (uses_iframe=false)")
 
         # Pagination loop
         page_num = 1
