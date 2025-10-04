@@ -110,22 +110,35 @@ class RFQJobTracker:
             existing = cursor.fetchone()
             
             if existing:
-                # Update existing job (including title in case they fix typos)
+                # NEVER overwrite existing job data - user's data is sacred!
+                # Only update last_seen to track that we still see this job
                 cursor.execute("""
-                    UPDATE jobs SET
-                        title = ?,
-                        last_seen = ?,
-                        due_date = ?,
-                        status = ?,
-                        work_type = ?
+                    UPDATE jobs SET last_seen = ?
                     WHERE job_id = ?
-                """, (job['title'], today, job['due_date'], job['status'], job['work_type'], job_id))
+                """, (today, job_id))
                 
-                # Keep user's previous status
-                job['job_id'] = job_id
-                job['user_status'] = existing[1]
-                job['user_notes'] = existing[2]
-                job['first_seen'] = existing[3]
+                # Fetch ALL existing data to return to user
+                cursor.execute("""
+                    SELECT job_id, rfp_number, organization, title, due_date, 
+                           link, first_seen, last_seen, status, work_type,
+                           user_status, user_notes
+                    FROM jobs WHERE job_id = ?
+                """, (job_id,))
+                existing_row = cursor.fetchone()
+                
+                # Use existing data, not scraped data (preserve original)
+                job['job_id'] = existing_row[0]
+                job['rfp_number'] = existing_row[1]
+                job['organization'] = existing_row[2]
+                job['title'] = existing_row[3]
+                job['due_date'] = existing_row[4]
+                job['link'] = existing_row[5]
+                job['first_seen'] = existing_row[6]
+                job['last_seen'] = today  # Updated
+                job['status'] = existing_row[8]
+                job['work_type'] = existing_row[9]
+                job['user_status'] = existing_row[10]
+                job['user_notes'] = existing_row[11]
             else:
                 # New job - insert (use INSERT OR IGNORE to handle duplicates in same scrape)
                 cursor.execute("""

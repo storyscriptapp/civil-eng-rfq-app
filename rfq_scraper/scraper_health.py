@@ -155,6 +155,20 @@ class ScraperHealthMonitor:
         report.append("=" * 60)
         return "\n".join(report)
     
+    def get_health_data(self):
+        """Get health data as structured JSON for API"""
+        return {
+            "timestamp": self.current_run['timestamp'],
+            "total_rfqs": self.current_run['total_rfqs'],
+            "cities_scraped": len(self.current_run['cities']),
+            "success_count": sum(1 for c in self.current_run['cities'].values() if c['status'] == 'success'),
+            "failed_count": sum(1 for c in self.current_run['cities'].values() if c['status'] != 'success'),
+            "alerts": self.current_run['alerts'],
+            "cities": self.current_run['cities'],
+            "has_critical_alerts": any(a['severity'] == 'critical' for a in self.current_run['alerts']),
+            "has_warnings": any(a['severity'] in ['warning', 'error'] for a in self.current_run['alerts'])
+        }
+    
     def send_notification(self, method="console"):
         """Send notification about the run"""
         report = self.generate_report()

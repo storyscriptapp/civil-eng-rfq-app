@@ -563,6 +563,11 @@ print("HEALTH REPORT")
 print("="*60)
 health_monitor.send_notification(method="console")
 
+# Save health data for API/UI
+health_data = health_monitor.get_health_data()
+with open("scraper_health.json", "w") as f:
+    json.dump(health_data, f, indent=2)
+
 # Safe cleanup
 try:
     driver.switch_to.default_content()

@@ -26,6 +26,7 @@ function App() {
     const [selectedJobId, setSelectedJobId] = useState(null);
     const [currentView, setCurrentView] = useState('rfqs'); // 'rfqs', 'cities', 'city-profile'
     const [selectedCity, setSelectedCity] = useState(null);
+    const [healthData, setHealthData] = useState(null);
 
     useEffect(() => {
         fetch('http://localhost:8000/rfqs')
@@ -39,6 +40,14 @@ function App() {
             .then(res => res.json())
             .then(data => setCities(data))
             .catch(err => console.error('Error fetching cities:', err));
+        // Fetch health data
+        fetch('http://localhost:8000/health')
+            .then(res => res.json())
+            .then(data => {
+                console.log('Health data:', data);
+                setHealthData(data);
+            })
+            .catch(err => console.error('Error fetching health data:', err));
     }, []);
 
     const addCity = () => {
@@ -218,6 +227,40 @@ function App() {
                 </div>
             </div>
 
+            {/* Health Alerts */}
+            {healthData && healthData.alerts && healthData.alerts.length > 0 && (
+                <div className="alert-container mb-4">
+                    {healthData.has_critical_alerts && (
+                        <div className="alert alert-danger">
+                            <h5 className="alert-heading">🚨 Critical Issues Detected</h5>
+                            <ul className="mb-0">
+                                {healthData.alerts.filter(a => a.severity === 'critical').map((alert, idx) => (
+                                    <li key={idx}><strong>{alert.city}:</strong> {alert.message}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    {healthData.has_warnings && !healthData.has_critical_alerts && (
+                        <div className="alert alert-warning">
+                            <h5 className="alert-heading">⚠️ Scraper Warnings</h5>
+                            <ul className="mb-0">
+                                {healthData.alerts.filter(a => a.severity === 'warning' || a.severity === 'error').map((alert, idx) => (
+                                    <li key={idx}><strong>{alert.city}:</strong> {alert.message}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    {healthData.timestamp && (
+                        <div className="text-muted small">
+                            Last scrape: {new Date(healthData.timestamp).toLocaleString()} | 
+                            Cities: {healthData.cities_scraped} | 
+                            Success: {healthData.success_count} | 
+                            Failed: {healthData.failed_count}
+                        </div>
+                    )}
+                </div>
+            )}
+
             {/* Filters */}
             <div className="card mb-4">
                 <div className="card-body">
@@ -318,18 +361,18 @@ function App() {
                     <h5 className="card-title">RFQs</h5>
                     <div className="table-responsive">
                         <table className="table table-hover">
-                            <thead>
-                                <tr>
+                <thead>
+                    <tr>
                                     <th>Status</th>
                                     <th>Job ID</th>
-                                    <th>Organization</th>
-                                    <th>Title</th>
-                                    <th>Work Type</th>
-                                    <th>Due Date</th>
+                        <th>Organization</th>
+                        <th>Title</th>
+                        <th>Work Type</th>
+                        <th>Due Date</th>
                                     <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    </tr>
+                </thead>
+                <tbody>
                                 {filteredRfqs.length === 0 ? (
                                     <tr>
                                         <td colSpan="7" className="text-center text-muted">
@@ -386,7 +429,7 @@ function App() {
                                                     <option value="unknown">Unknown</option>
                                                 </select>
                                             </td>
-                                            <td>{rfq.due_date}</td>
+                            <td>{rfq.due_date}</td>
                                             <td>
                                                 <div className="btn-group btn-group-sm" role="group">
                                                     <button 
@@ -412,11 +455,11 @@ function App() {
                                                     </button>
                                                 </div>
                                             </td>
-                                        </tr>
+                        </tr>
                                     ))
                                 )}
-                            </tbody>
-                        </table>
+                </tbody>
+            </table>
                     </div>
                 </div>
             </div>

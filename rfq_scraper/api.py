@@ -35,6 +35,27 @@ async def get_rfqs():
     except json.JSONDecodeError:
         return []
 
+@app.get("/health")
+async def get_health():
+    """Get scraper health monitoring data"""
+    health_path = os.path.join(os.path.dirname(__file__), "scraper_health.json")
+    try:
+        with open(health_path, 'r') as f:
+            health_data = json.load(f)
+        return health_data
+    except FileNotFoundError:
+        return {
+            "error": "No health data available - scraper has not run yet",
+            "alerts": [],
+            "cities": {}
+        }
+    except json.JSONDecodeError:
+        return {
+            "error": "Health data file is corrupted",
+            "alerts": [],
+            "cities": {}
+        }
+
 @app.post("/run_scraper")
 async def run_scraper(data: dict = None):
     """Run scraper for all cities or selected cities"""
