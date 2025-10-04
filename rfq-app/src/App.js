@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import JobDetails from './JobDetails';
+import CitiesList from './CitiesList';
+import CityProfile from './CityProfile';
 
 function App() {
     const [rfqs, setRfqs] = useState([]);
@@ -22,6 +24,8 @@ function App() {
     
     // Selected job for detail view
     const [selectedJobId, setSelectedJobId] = useState(null);
+    const [currentView, setCurrentView] = useState('rfqs'); // 'rfqs', 'cities', 'city-profile'
+    const [selectedCity, setSelectedCity] = useState(null);
 
     useEffect(() => {
         fetch('http://localhost:8000/rfqs')
@@ -150,6 +154,20 @@ function App() {
     // Get unique organizations for filter dropdown
     const organizations = [...new Set(rfqs.map(rfq => rfq.organization))].sort();
 
+    // Navigation handlers
+    const handleCitySelect = (cityName) => {
+        setSelectedCity(cityName);
+        setCurrentView('city-profile');
+    };
+
+    const handleViewJobs = (cityName) => {
+        setCurrentView('rfqs');
+        setFilters({
+            ...filters,
+            organization: cityName
+        });
+    };
+
     // If viewing a specific job, show the JobDetails component
     if (selectedJobId) {
         return <JobDetails jobId={selectedJobId} onBack={() => {
@@ -162,13 +180,42 @@ function App() {
         }} />;
     }
 
+    // If viewing cities list
+    if (currentView === 'cities') {
+        return (
+            <CitiesList 
+                onCitySelect={handleCitySelect}
+                onBack={() => setCurrentView('rfqs')}
+            />
+        );
+    }
+
+    // If viewing city profile
+    if (currentView === 'city-profile' && selectedCity) {
+        return (
+            <CityProfile 
+                cityName={selectedCity}
+                onBack={() => setCurrentView('cities')}
+                onViewJobs={handleViewJobs}
+            />
+        );
+    }
+
     return (
         <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h1>RFQ Tracker</h1>
-                <button className="btn btn-primary" onClick={runScraper}>
-                    <i className="bi bi-arrow-clockwise"></i> Run Scraper
-                </button>
+                <div className="d-flex gap-2">
+                    <button 
+                        onClick={() => setCurrentView('cities')} 
+                        className="btn btn-info"
+                    >
+                        📍 View Cities ({organizations.length})
+                    </button>
+                    <button className="btn btn-primary" onClick={runScraper}>
+                        <i className="bi bi-arrow-clockwise"></i> Run Scraper
+                    </button>
+                </div>
             </div>
 
             {/* Filters */}

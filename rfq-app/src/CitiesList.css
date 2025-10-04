@@ -1,0 +1,159 @@
+.cities-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.cities-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+.cities-header h1 {
+  margin: 0;
+  flex-grow: 1;
+}
+
+.back-button {
+  padding: 8px 16px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background: #5a6268;
+}
+
+.cities-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.scrape-button {
+  padding: 10px 20px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.scrape-button:hover:not(:disabled) {
+  background: #218838;
+}
+
+.scrape-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.cities-table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.cities-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cities-table thead {
+  background: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.cities-table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  white-space: nowrap;
+}
+
+.cities-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.cities-table th.sortable:hover {
+  background: #e9ecef;
+}
+
+.cities-table td {
+  padding: 12px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.cities-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.city-name-link {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: inherit;
+  font-weight: 600;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.city-name-link:hover {
+  color: #0056b3;
+}
+
+.data-placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.cities-footer {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.cities-footer p {
+  margin: 5px 0;
+}
+
+.placeholder-note {
+  color: #6c757d;
+  font-size: 0.9em;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2em;
+  color: #6c757d;
+}
+

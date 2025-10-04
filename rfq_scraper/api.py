@@ -336,3 +336,107 @@ async def upload_screenshot(file: UploadFile = File(...), organization: str = "U
             "documents": []
         })
     return {"rfqs": results}
+
+@app.get("/cities")
+async def get_cities():
+    """Get all cities/organizations with their configuration and stats"""
+    cities_path = os.path.join(os.path.dirname(__file__), "cities.json")
+    rfqs_path = os.path.join(os.path.dirname(__file__), "rfqs.json")
+    
+    try:
+        with open(cities_path, 'r') as f:
+            cities_config = json.load(f)
+        
+        # Get job counts per organization
+        try:
+            with open(rfqs_path, 'r') as f:
+                rfqs = json.load(f)
+            job_counts = {}
+            for rfq in rfqs:
+                org = rfq.get('organization', 'Unknown')
+                job_counts[org] = job_counts.get(org, 0) + 1
+        except:
+            job_counts = {}
+        
+        # Build cities list with placeholder data
+        cities = []
+        for city in cities_config:
+            cities.append({
+                "name": city.get("organization", "Unknown"),
+                "url": city.get("url", ""),
+                "is_active": not city.get("manual", False),
+                "job_count": job_counts.get(city.get("organization"), 0),
+                # Placeholder fields
+                "population_current": None,
+                "population_2020": None,
+                "contact_name": None,
+                "avg_household_income": None,
+                "bonds_upcoming": None,
+                "bonds_last": None
+            })
+        
+        return cities
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/city_profile/{city_name}")
+async def get_city_profile(city_name: str):
+    """Get detailed profile for a specific city/organization"""
+    cities_path = os.path.join(os.path.dirname(__file__), "cities.json")
+    rfqs_path = os.path.join(os.path.dirname(__file__), "rfqs.json")
+    
+    try:
+        # Find city in config
+        with open(cities_path, 'r') as f:
+            cities_config = json.load(f)
+        
+        city_config = None
+        for city in cities_config:
+            if city.get("organization") == city_name:
+                city_config = city
+                break
+        
+        if not city_config:
+            return {"error": "City not found"}
+        
+        # Get job count for this city
+        try:
+            with open(rfqs_path, 'r') as f:
+                rfqs = json.load(f)
+            job_count = sum(1 for rfq in rfqs if rfq.get('organization') == city_name)
+        except:
+            job_count = 0
+        
+        # Build profile with config data and placeholders
+        profile = {
+            "name": city_config.get("organization", "Unknown"),
+            "url": city_config.get("url", ""),
+            "is_active": not city_config.get("manual", False),
+            "is_dynamic": city_config.get("is_dynamic", False),
+            "uses_cloudflare": city_config.get("uses_cloudflare", False),
+            "has_pagination": city_config.get("has_pagination", False),
+            "note": city_config.get("note", ""),
+            "job_count": job_count,
+            # Placeholder fields for demographics
+            "population_current": None,
+            "population_2020": None,
+            "expected_growth": None,
+            "avg_household_income": None,
+            "drive_time": None,
+            # Placeholder fields for contacts
+            "contact_name": None,
+            "contact_email": None,
+            "contact_phone": None,
+            # Placeholder fields for bonds
+            "bonds_upcoming": None,
+            "bonds_last": None,
+            "bond_amount": None,
+            # Placeholder for notes
+            "internal_notes": None,
+            # Placeholder for scrape history
+            "scrape_history": []
+        }
+        
+        return profile
+    except Exception as e:
+        return {"error": str(e)}
