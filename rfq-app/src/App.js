@@ -12,6 +12,7 @@ function App() {
     const [cities, setCities] = useState([]);
     const [newCity, setNewCity] = useState({ organization: '', url: '', row_selector: '', cell_count: 4, is_dynamic: false, manual: false });
     const [pasteText, setPasteText] = useState('');
+    const [pasteUrl, setPasteUrl] = useState('');
     const [screenshot, setScreenshot] = useState(null);
     const [screenshotOrg, setScreenshotOrg] = useState('');
     
@@ -90,7 +91,11 @@ function App() {
         fetch('http://localhost:8000/parse_text', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: pasteText, organization: screenshotOrg })
+            body: JSON.stringify({ 
+                text: pasteText, 
+                organization: screenshotOrg,
+                url: pasteUrl.trim() || ''
+            })
         })
             .then(res => res.json())
             .then(data => {
@@ -101,6 +106,7 @@ function App() {
                     fetchRfqs();
                     // Clear the input fields
                     setPasteText('');
+                    setPasteUrl('');
                 } else {
                     alert('⚠️ Could not parse any jobs from the text. Check the format and try again.');
                 }
@@ -545,12 +551,20 @@ function App() {
                                 <input 
                                     type="text" 
                                     className="form-control mb-2" 
-                                    placeholder="Organization for Manual Input" 
+                                    placeholder="Organization Name (e.g., City of Chandler)" 
+                                    value={screenshotOrg}
                                     onChange={e => setScreenshotOrg(e.target.value)} 
+                                />
+                                <input 
+                                    type="url" 
+                                    className="form-control mb-2" 
+                                    placeholder="Job URL (e.g., https://procurement.az.gov/...)" 
+                                    value={pasteUrl}
+                                    onChange={e => setPasteUrl(e.target.value)} 
                                 />
                                 <textarea 
                                     className="form-control mb-2" 
-                                    placeholder="Paste RFQ text here" 
+                                    placeholder="Paste RFQ text here (Project number, title, due date, description...)" 
                                     value={pasteText} 
                                     onChange={e => setPasteText(e.target.value)} 
                                     rows="4"

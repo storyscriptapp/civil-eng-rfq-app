@@ -365,6 +365,7 @@ async def parse_text(data: dict):
     """Parse text to extract RFQ information - handles multiple formats"""
     text = data.get("text", "")
     org = data.get("organization", "Unknown")
+    url = data.get("url", "")
     
     results = []
     
@@ -442,7 +443,7 @@ async def parse_text(data: dict):
             "open_date": date.today().strftime("%Y-%m-%d"),
             "due_date": due_date,
             "status": "Open",
-            "link": "",
+            "link": url if url else "",
             "documents": []
         }
         results.append(job_data)
