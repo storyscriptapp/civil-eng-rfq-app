@@ -163,8 +163,14 @@ function JobDetails({ jobId, auth, onBack }) {
                     <p className="text-muted mb-2">
                         <strong>First Seen:</strong> {new Date(job.first_seen).toLocaleString()}
                     </p>
-                    <p className="text-muted">
+                    <p className="text-muted mb-2">
                         <strong>Last Seen:</strong> {new Date(job.last_seen).toLocaleString()}
+                    </p>
+                    <p className="text-muted mb-2">
+                        <strong>Added By:</strong> 
+                        <span className={`badge ms-2 ${job.added_by === 'parsed' ? 'bg-info' : 'bg-success'}`}>
+                            {job.added_by === 'parsed' ? '📝 Manual Parsing' : '🤖 Scraper'}
+                        </span>
                     </p>
                     {scrapeHistory.length > 0 && (
                         <div className="mt-3">
@@ -173,6 +179,20 @@ function JobDetails({ jobId, auth, onBack }) {
                     )}
                 </div>
             </div>
+
+            {/* Job Info - Extra details from parsing */}
+            {job.job_info && (
+                <div className="card mb-3">
+                    <div className="card-header">
+                        <h6 className="mb-0">Additional Job Information</h6>
+                    </div>
+                    <div className="card-body">
+                        <pre className="mb-0" style={{whiteSpace: 'pre-wrap', fontSize: '0.9rem'}}>
+                            {job.job_info}
+                        </pre>
+                    </div>
+                </div>
+            )}
 
             {/* Journal Entries */}
             <div className="card">

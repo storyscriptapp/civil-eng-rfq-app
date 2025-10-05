@@ -35,7 +35,7 @@ async def get_rfqs():
         cursor.execute("""
             SELECT job_id, rfp_number, organization, title, due_date, 
                    link, first_seen, last_seen, status, work_type,
-                   user_status, user_notes
+                   user_status, user_notes, job_info, added_by
             FROM jobs
             ORDER BY last_seen DESC, organization, title
         """)
@@ -54,7 +54,9 @@ async def get_rfqs():
                 "status": row[8],
                 "work_type": row[9],
                 "user_status": row[10],
-                "user_notes": row[11]
+                "user_notes": row[11],
+                "job_info": row[12] if len(row) > 12 else "",
+                "added_by": row[13] if len(row) > 13 else "scraped"
             })
         
         return jobs
@@ -214,7 +216,7 @@ async def get_job_details(job_id: str):
     # Get job details
     cursor.execute("""
         SELECT job_id, organization, title, rfp_number, work_type, due_date, 
-               link, user_status, user_notes, first_seen, last_seen
+               link, user_status, user_notes, first_seen, last_seen, job_info, added_by
         FROM jobs
         WHERE job_id = ?
     """, (job_id,))
@@ -235,7 +237,9 @@ async def get_job_details(job_id: str):
         "user_status": job[7],
         "user_notes": job[8],
         "first_seen": job[9],
-        "last_seen": job[10]
+        "last_seen": job[10],
+        "job_info": job[11] if len(job) > 11 else "",
+        "added_by": job[12] if len(job) > 12 else "scraped"
     }
     
     # Get scrape history (first_seen and last_seen from jobs table)
@@ -369,51 +373,83 @@ async def parse_text(data: dict):
     
     results = []
     
-    # Try multiple patterns for RFP/Project number and title
-    patterns = [
-        # Pattern 1: "RFP #123 - Title"
-        r"(RFP\s*#?[^\s:]+)\s*-\s*(.*?)(?=\n|$)",
-        # Pattern 2: "Project No.: ABC123 - TITLE"
-        r"Project\s+No\.?:\s*([^\s-]+)\s*-\s*(.*?)(?=\n|Pre-Sub|Solicitation|Statement)",
-        # Pattern 3: "RFQ #123 - Title"
-        r"(RFQ\s*#?[^\s:]+)\s*-\s*(.*?)(?=\n|$)",
-        # Pattern 4: "Bid #123 - Title"
-        r"(Bid\s*#?[^\s:]+)\s*-\s*(.*?)(?=\n|$)",
-    ]
-    
+    # Try multiple patterns for RFP/Project/Code/Solicitation number and title
     rfp_number = ""
     title = ""
+    job_info_parts = []
     
-    # Try each pattern until one matches
-    for pattern in patterns:
-        matches = re.findall(pattern, text, re.MULTILINE | re.IGNORECASE)
-        if matches:
-            rfp_number, title = matches[0]
-            break
+    # Pattern 1: Arizona State format with "Code" and "Label"
+    code_match = re.search(r'Code\s*\n\s*([^\n]+)', text, re.IGNORECASE)
+    label_match = re.search(r'Label\s*\n\s*([^\n]+)', text, re.IGNORECASE)
+    if code_match and label_match:
+        rfp_number = code_match.group(1).strip()
+        title = label_match.group(1).strip()
+    else:
+        # Try standard patterns with "- Title" format
+        patterns = [
+            # "Project No.: ABC123 - TITLE"
+            r"Project\s+No\.?:\s*([^\s-]+)\s*-\s*(.*?)(?=\n|Pre-Sub|Solicitation|Statement)",
+            # "RFP #123 - Title"
+            r"(RFP\s*#?[^\s:]+)\s*-\s*(.*?)(?=\n|$)",
+            # "RFQ #123 - Title"
+            r"(RFQ\s*#?[^\s:]+)\s*-\s*(.*?)(?=\n|$)",
+            # "Bid #123 - Title"  
+            r"(Bid\s*#?[^\s:]+)\s*-\s*(.*?)(?=\n|$)",
+            # "Solicitation #123 - Title"
+            r"(Solicitation\s*#?[^\s:]+)\s*-\s*(.*?)(?=\n|$)",
+        ]
+        
+        for pattern in patterns:
+            matches = re.findall(pattern, text, re.MULTILINE | re.IGNORECASE)
+            if matches:
+                rfp_number, title = matches[0]
+                break
+        
+        # If still no match, try to extract from structured format
+        if not rfp_number and not title:
+            lines = text.strip().split('\n')
+            if lines:
+                first_line = lines[0].strip()
+                # Look for ID patterns
+                num_match = re.search(r'((?:Project|RFP|RFQ|Bid|Solicitation|Code)\s*(?:No\.?|#)?:?\s*[\w\.-]+)', first_line, re.IGNORECASE)
+                if num_match:
+                    rfp_number = num_match.group(1)
+                    title = first_line.replace(rfp_number, '').strip(' -:')
+                else:
+                    title = first_line
+                    rfp_number = "N/A"
     
-    # If no pattern matched, try to extract title from first line
-    if not rfp_number and not title:
-        lines = text.strip().split('\n')
-        if lines:
-            first_line = lines[0].strip()
-            # Look for project/RFP number in first line
-            num_match = re.search(r'((?:Project|RFP|RFQ|Bid)\s*(?:No\.?|#)?:?\s*[\w\.-]+)', first_line, re.IGNORECASE)
-            if num_match:
-                rfp_number = num_match.group(1)
-                # Rest of first line is title
-                title = first_line.replace(rfp_number, '').strip(' -:')
-            else:
-                # No number found, use first line as title
-                title = first_line
-                rfp_number = "N/A"
+    # Extract all useful info for job_info field
+    info_patterns = {
+        'Organization': r'Organization\s*\n\s*([^\n]+)',
+        'Procurement Officer': r'Procurement Officer\s*\n\s*([^\n]+)',
+        'PO Email': r'Procurement Officer Email\s*\n\s*([^\n]+)',
+        'PO Phone': r'Procurement Officer Phone\s*\n\s*([^\n]+)',
+        'Fiscal Year': r'Fiscal Year\s*\n\s*([^\n]+)',
+        'Commodity': r'Commodity\s*\n\s*([^\n]+)',
+        'Begin Date': r'Begin Date\s*\n\s*([^\n]+)',
+        'Summary': r'Summary\s*\n\s*([^\n]+(?:\n(?!Code|Organization|Label|Fiscal)[^\n]+)*)',
+        'Process': r'Process\s*\n\s*([^\n]+(?:\n(?!Code|Organization|Label|Fiscal)[^\n]+)*)',
+    }
     
-    # Extract due date - look for various formats
+    for key, pattern in info_patterns.items():
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            value = match.group(1).strip()
+            if value:
+                job_info_parts.append(f"{key}: {value}")
+    
+    # Combine all extra info
+    job_info = "\n".join(job_info_parts) if job_info_parts else ""
+    
+    # Extract due date - look for various formats (including "End Date" for Arizona state)
     due_date = "N/A"
     due_date_patterns = [
+        r"End Date\s*\n\s*([^\n]+)",  # Arizona state format
         r"Due Date[:\s]*([^\n]+?)(?:Arizona Time|\n|$)",
-        r"End Date[:\s]*([^\n]+?)(?:Arizona Time|\n|$)",
         r"Submittal Due Date[:\s]*([^\n]+?)(?:Arizona Time|\n|$)",
         r"(?:Closes?|Closing)[:\s]*([^\n]+?)(?:Arizona Time|\n|$)",
+        r"SOQ.*Submittal Due Date[:\s]*([^\n]+?)(?:Arizona Time|\n|$)",
     ]
     
     for pattern in due_date_patterns:
@@ -421,7 +457,9 @@ async def parse_text(data: dict):
         if date_match:
             due_date = date_match.group(1).strip()
             # Clean up common suffixes
-            due_date = re.sub(r'\s*(Arizona Time|MST|AZ)', '', due_date).strip()
+            due_date = re.sub(r'\s*(Arizona Time|MST|AZ|UTC[+-]\d+)', '', due_date).strip()
+            # Remove extra whitespace
+            due_date = ' '.join(due_date.split())
             break
     
     # Determine work type
@@ -444,18 +482,51 @@ async def parse_text(data: dict):
             "due_date": due_date,
             "status": "Open",
             "link": url if url else "",
-            "documents": []
+            "documents": [],
+            "job_info": job_info,
+            "added_by": "parsed"
         }
         results.append(job_data)
         
-        # Save to database
+        # Save to database directly (not through process_scraped_jobs)
         try:
             from job_tracking import RFQJobTracker
             tracker = RFQJobTracker()
-            tracker.process_scraped_jobs([job_data])
+            
+            # Generate job ID
+            job_id = tracker.generate_job_id(org, rfp_number.strip(), title.strip())
+            
+            # Insert directly with new fields
+            cursor = tracker.conn.cursor()
+            today = date.today().strftime("%Y-%m-%d")
+            
+            cursor.execute("""
+                INSERT OR REPLACE INTO jobs (
+                    job_id, rfp_number, organization, title,
+                    due_date, link, first_seen, last_seen,
+                    status, work_type, user_status, job_info, added_by
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?)
+            """, (
+                job_id, rfp_number.strip(), org, title.strip(),
+                due_date, url if url else "", today, today,
+                "Open", work_type, job_info, "parsed"
+            ))
+            
+            tracker.conn.commit()
+            
+            # Add to scrape history
+            cursor.execute("""
+                INSERT INTO job_scrape_history (job_id, scraped_at, title, due_date, status)
+                VALUES (?, ?, ?, ?, ?)
+            """, (job_id, today, title.strip(), due_date, "Open"))
+            
+            tracker.conn.commit()
+            
             print(f"✅ Saved manually parsed job to database: {title[:50]}...")
         except Exception as e:
             print(f"⚠️ Error saving to database: {e}")
+            import traceback
+            traceback.print_exc()
     
     return {"rfqs": results, "saved_to_db": len(results) > 0}
 
