@@ -197,10 +197,14 @@ for site_idx, site in enumerate(sites):
                 print(f"⚠️ No iframe found for {org}, continuing without iframe")
         elif is_dynamic and not uses_iframe:
             print(f"⏭️  Skipping iframe for {org} (uses_iframe=false)")
-            # BidNet Direct needs time to load dynamic content even without iframe
+            # All dynamic sites need time to load content
+            print(f"⏳ Dynamic site - waiting for content to load...")
             if 'bidnetdirect' in url.lower():
-                print(f"⏳ BidNet Direct detected - waiting for dynamic content...")
-                time.sleep(5)
+                time.sleep(5)  # BidNet Direct
+            elif 'casagrandeaz.gov' in url.lower() or 'ionwave.net' in url.lower():
+                time.sleep(3)  # Casa Grande and Coconino (IonWave)
+            else:
+                time.sleep(2)  # Default for other dynamic sites
 
         # Pagination loop
         page_num = 1

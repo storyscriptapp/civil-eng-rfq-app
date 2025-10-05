@@ -99,11 +99,11 @@
     {
         "organization": "Coconino County",
         "url": "https://coconino.ionwave.net/SourcingEvents.aspx?SourceType=1",
-        "row_selector": "table.rgMasterTable tbody tr:not(.rgNoRecords)",
+        "row_selector": "table.rgMasterTable tbody tr:not(.rgNoRecords):not(.rgFilterRow)",
         "cell_count": 7,
         "is_dynamic": true,
         "manual": false,
-        "note": "IonWave platform - dynamic table with 7 columns"
+        "note": "IonWave platform - dynamic table with 7 columns (excludes filter row)"
     },
     {
         "organization": "Gila County",
