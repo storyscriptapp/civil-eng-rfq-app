@@ -327,8 +327,28 @@ for site_idx, site in enumerate(sites):
                     is_bidnet_direct = "bidnetdirect" in url.lower()
                     is_bonfire = "bonfire" in url.lower()
                     is_casa_grande = org == "City of Casa Grande"
+                    is_coconino = org == "Coconino County"
                     
-                    if is_bidnet_direct and cell_count == 1:
+                    if is_coconino and cell_count == 7:
+                        # Coconino County (IonWave): Simple table structure with plain text
+                        # Cell 0: View icon, Cell 1: Bid Number, Cell 2: Title, Cell 3: Type, 
+                        # Cell 4: Org (hidden), Cell 5: Issue Date, Cell 6: Close Date
+                        try:
+                            rfp_number = cells[1].text.strip()
+                            title = cells[2].text.strip()
+                            due_date = cells[6].text.strip()  # Close date
+                        except Exception as e:
+                            print(f"⚠️ Error extracting Coconino data: {e}")
+                            rfp_number = "N/A"
+                            due_date = "N/A"
+                        
+                        # No clickable links in this table - use main page
+                        link = url
+                        documents = []
+                        status = "Open"
+                        print(f"✅ Coconino: {rfp_number} - {title[:50]}...")
+                    
+                    elif is_bidnet_direct and cell_count == 1:
                         # BidNet Direct: All data in one cell with nested divs
                         # .sol-num = RFP number, .sol-title a = title/link, .date-value = dates
                         try:
