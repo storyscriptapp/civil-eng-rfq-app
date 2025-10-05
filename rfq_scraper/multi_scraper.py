@@ -458,6 +458,12 @@ for site_idx, site in enumerate(sites):
 
                 open_date = date.today().strftime("%Y-%m-%d")
                 
+                # Skip help/support/navigation links (not actual RFQs)
+                skip_keywords = ["help center", "visit help", "support", "login", "sign in", "subscribe", "vendor guide", "home", "contact us"]
+                if any(keyword in title.lower() for keyword in skip_keywords):
+                    print(f"⏭️  Skipping non-RFQ link: {title[:50]}...")
+                    continue
+                
                 # Check for duplicates
                 if title in seen_titles:
                     continue  # Skip duplicate

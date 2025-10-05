@@ -82,6 +82,11 @@ function App() {
     };
 
     const parseText = () => {
+        if (!screenshotOrg || !pasteText.trim()) {
+            alert('Please enter both organization name and text to parse');
+            return;
+        }
+        
         fetch('http://localhost:8000/parse_text', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -89,10 +94,21 @@ function App() {
         })
             .then(res => res.json())
             .then(data => {
-                setRfqs([...rfqs, ...data.rfqs]);
-                console.log('Parsed RFQs:', data);
+                console.log('Parse result:', data);
+                if (data.rfqs && data.rfqs.length > 0) {
+                    alert(`✅ Successfully parsed and saved ${data.rfqs.length} job(s)!`);
+                    // Reload RFQs from database to get complete data with job_id
+                    fetchRfqs();
+                    // Clear the input fields
+                    setPasteText('');
+                } else {
+                    alert('⚠️ Could not parse any jobs from the text. Check the format and try again.');
+                }
             })
-            .catch(err => console.error('Error parsing text:', err));
+            .catch(err => {
+                console.error('Error parsing text:', err);
+                alert('❌ Error parsing text. Check console for details.');
+            });
     };
 
     const uploadScreenshot = () => {

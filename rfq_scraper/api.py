@@ -362,21 +362,79 @@ async def add_journal_entry(data: dict):
 
 @app.post("/parse_text")
 async def parse_text(data: dict):
+    """Parse text to extract RFQ information - handles multiple formats"""
     text = data.get("text", "")
     org = data.get("organization", "Unknown")
-    rfq_pattern = re.compile(r"(RFP\s*#[^\s]+)\s*-\s*(.*?)(?=\n|$)", re.MULTILINE)
-    matches = rfq_pattern.findall(text)
+    
     results = []
-    for rfp_number, title in matches:
-        due_date_match = re.search(r"(?:End Date|Due Date)[^\n]*\n([^\n]+)", text, re.IGNORECASE)
-        due_date = due_date_match.group(1).strip() if due_date_match else ""
-        title_lower = title.lower()
-        work_type = "unknown"
-        if any(word in title_lower for word in ["utility", "irrigation", "sewer", "transportation", "road", "bridge", "hydraulics", "storm drain"]):
-            work_type = "utility/transportation"
-        elif any(word in title_lower for word in ["landscaping", "maintenance"]):
-            work_type = "maintenance"
-        results.append({
+    
+    # Try multiple patterns for RFP/Project number and title
+    patterns = [
+        # Pattern 1: "RFP #123 - Title"
+        r"(RFP\s*#?[^\s:]+)\s*-\s*(.*?)(?=\n|$)",
+        # Pattern 2: "Project No.: ABC123 - TITLE"
+        r"Project\s+No\.?:\s*([^\s-]+)\s*-\s*(.*?)(?=\n|Pre-Sub|Solicitation|Statement)",
+        # Pattern 3: "RFQ #123 - Title"
+        r"(RFQ\s*#?[^\s:]+)\s*-\s*(.*?)(?=\n|$)",
+        # Pattern 4: "Bid #123 - Title"
+        r"(Bid\s*#?[^\s:]+)\s*-\s*(.*?)(?=\n|$)",
+    ]
+    
+    rfp_number = ""
+    title = ""
+    
+    # Try each pattern until one matches
+    for pattern in patterns:
+        matches = re.findall(pattern, text, re.MULTILINE | re.IGNORECASE)
+        if matches:
+            rfp_number, title = matches[0]
+            break
+    
+    # If no pattern matched, try to extract title from first line
+    if not rfp_number and not title:
+        lines = text.strip().split('\n')
+        if lines:
+            first_line = lines[0].strip()
+            # Look for project/RFP number in first line
+            num_match = re.search(r'((?:Project|RFP|RFQ|Bid)\s*(?:No\.?|#)?:?\s*[\w\.-]+)', first_line, re.IGNORECASE)
+            if num_match:
+                rfp_number = num_match.group(1)
+                # Rest of first line is title
+                title = first_line.replace(rfp_number, '').strip(' -:')
+            else:
+                # No number found, use first line as title
+                title = first_line
+                rfp_number = "N/A"
+    
+    # Extract due date - look for various formats
+    due_date = "N/A"
+    due_date_patterns = [
+        r"Due Date[:\s]*([^\n]+?)(?:Arizona Time|\n|$)",
+        r"End Date[:\s]*([^\n]+?)(?:Arizona Time|\n|$)",
+        r"Submittal Due Date[:\s]*([^\n]+?)(?:Arizona Time|\n|$)",
+        r"(?:Closes?|Closing)[:\s]*([^\n]+?)(?:Arizona Time|\n|$)",
+    ]
+    
+    for pattern in due_date_patterns:
+        date_match = re.search(pattern, text, re.IGNORECASE)
+        if date_match:
+            due_date = date_match.group(1).strip()
+            # Clean up common suffixes
+            due_date = re.sub(r'\s*(Arizona Time|MST|AZ)', '', due_date).strip()
+            break
+    
+    # Determine work type
+    combined_text = (title + " " + text).lower()
+    work_type = "unknown"
+    if any(word in combined_text for word in ["utility", "irrigation", "sewer", "water", "wastewater", "transportation", "road", "bridge", "hydraulics", "storm drain", "street", "highway"]):
+        work_type = "civil"
+    elif any(word in combined_text for word in ["landscaping", "maintenance", "cleaning", "janitorial"]):
+        work_type = "maintenance"
+    elif any(word in combined_text for word in ["construction", "building", "renovation", "demolition"]):
+        work_type = "construction"
+    
+    if rfp_number and title:
+        job_data = {
             "organization": org,
             "rfp_number": rfp_number.strip(),
             "title": title.strip(),
@@ -386,8 +444,19 @@ async def parse_text(data: dict):
             "status": "Open",
             "link": "",
             "documents": []
-        })
-    return {"rfqs": results}
+        }
+        results.append(job_data)
+        
+        # Save to database
+        try:
+            from job_tracking import RFQJobTracker
+            tracker = RFQJobTracker()
+            tracker.process_scraped_jobs([job_data])
+            print(f"✅ Saved manually parsed job to database: {title[:50]}...")
+        except Exception as e:
+            print(f"⚠️ Error saving to database: {e}")
+    
+    return {"rfqs": results, "saved_to_db": len(results) > 0}
 
 @app.post("/upload_screenshot")
 async def upload_screenshot(file: UploadFile = File(...), organization: str = "Unknown"):

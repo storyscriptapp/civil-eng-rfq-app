@@ -1,28 +1,22 @@
 {
-  "timestamp": "2025-10-05T00:24:56.270395",
-  "total_rfqs": 16,
-  "cities_scraped": 3,
-  "success_count": 3,
+  "timestamp": "2025-10-05T12:05:15.592140",
+  "total_rfqs": 2,
+  "cities_scraped": 2,
+  "success_count": 2,
   "failed_count": 0,
   "alerts": [],
   "cities": {
-    "Maricopa County": {
-      "rfq_count": 12,
+    "Town of Florence": {
+      "rfq_count": 1,
       "status": "success",
       "error": null,
-      "strategy_used": "default"
+      "strategy_used": "div_rows"
     },
-    "Coconino County": {
-      "rfq_count": 2,
+    "Town of Queen Creek": {
+      "rfq_count": 1,
       "status": "success",
       "error": null,
-      "strategy_used": "default"
-    },
-    "City of Casa Grande": {
-      "rfq_count": 2,
-      "status": "success",
-      "error": null,
-      "strategy_used": "default"
+      "strategy_used": "div_rows"
     }
   },
   "has_critical_alerts": false,
