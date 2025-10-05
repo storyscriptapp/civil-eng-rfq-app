@@ -134,7 +134,10 @@ function App() {
     const updateWorkType = (jobId, workType) => {
         fetch('http://localhost:8000/update_work_type', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${auth}`
+            },
             body: JSON.stringify({ job_id: jobId, work_type: workType })
         })
             .then(res => res.json())
@@ -194,7 +197,7 @@ function App() {
 
     // If viewing a specific job, show the JobDetails component
     if (selectedJobId) {
-        return <JobDetails jobId={selectedJobId} onBack={() => {
+        return <JobDetails jobId={selectedJobId} auth={auth} onBack={() => {
             setSelectedJobId(null);
             // Refresh RFQs list when returning
             fetch('http://localhost:8000/rfqs')

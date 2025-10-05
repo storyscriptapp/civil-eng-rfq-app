@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-function JobDetails({ jobId, onBack }) {
+function JobDetails({ jobId, auth, onBack }) {
     const [job, setJob] = useState(null);
     const [scrapeHistory, setScrapeHistory] = useState([]);
     const [journalEntries, setJournalEntries] = useState([]);
@@ -34,7 +34,10 @@ function JobDetails({ jobId, onBack }) {
     const updateTitle = () => {
         fetch('http://localhost:8000/update_job_details', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${auth}`
+            },
             body: JSON.stringify({ job_id: jobId, title: newTitle })
         })
             .then(res => res.json())

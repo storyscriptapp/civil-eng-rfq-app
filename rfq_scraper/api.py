@@ -25,15 +25,40 @@ app.add_middleware(
 
 @app.get("/rfqs")
 async def get_rfqs():
-    # Read from rfqs.json (new format with job tracking)
-    rfqs_path = os.path.join(os.path.dirname(__file__), "rfqs.json")
+    # Read from database (source of truth) instead of rfqs.json
+    tracker = RFQJobTracker()
+    conn = tracker.conn
+    cursor = conn.cursor()
+    
     try:
-        with open(rfqs_path, 'r') as f:
-            rfqs = json.load(f)
-        return rfqs
-    except FileNotFoundError:
-        return []
-    except json.JSONDecodeError:
+        cursor.execute("""
+            SELECT job_id, rfp_number, organization, title, due_date, 
+                   link, first_seen, last_seen, status, work_type,
+                   user_status, user_notes
+            FROM jobs
+            ORDER BY last_seen DESC, organization, title
+        """)
+        
+        jobs = []
+        for row in cursor.fetchall():
+            jobs.append({
+                "job_id": row[0],
+                "rfp_number": row[1],
+                "organization": row[2],
+                "title": row[3],
+                "due_date": row[4],
+                "link": row[5],
+                "first_seen": row[6],
+                "last_seen": row[7],
+                "status": row[8],
+                "work_type": row[9],
+                "user_status": row[10],
+                "user_notes": row[11]
+            })
+        
+        return jobs
+    except Exception as e:
+        print(f"Error reading from database: {e}")
         return []
 
 @app.get("/health")
@@ -56,6 +81,11 @@ async def get_health():
             "alerts": [],
             "cities": {}
         }
+
+@app.get("/verify")
+async def verify_auth(username: str = Depends(get_current_username)):
+    """Verify authentication credentials"""
+    return {"authenticated": True, "username": username}
 
 @app.post("/run_scraper")
 async def run_scraper(data: dict = None, username: str = Depends(get_current_username)):

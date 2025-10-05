@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-10-04T22:22:00.514393",
+  "total_rfqs": 30,
+  "cities_scraped": 1,
+  "success_count": 1,
+  "failed_count": 0,
+  "alerts": [],
+  "cities": {
+    "City of Gilbert": {
+      "rfq_count": 30,
+      "status": "success",
+      "error": null,
+      "strategy_used": "default"
+    }
+  },
+  "has_critical_alerts": false,
+  "has_warnings": false
+}

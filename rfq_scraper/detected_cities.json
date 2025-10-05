@@ -1,0 +1,140 @@
+[
+    {
+        "organization": "Maricopa County",
+        "url": "https://www.maricopa.gov/2190/Solicitations",
+        "confidence": "low",
+        "notes": [
+            "\ud83d\udd32 2 iframe(s) found - may need switching",
+            "\u274c No table found with standard selectors",
+            "\ud83d\udcc4 Pagination detected",
+            "\ud83d\udcf8 Screenshot saved: city_analysis_maricopa_county.png"
+        ],
+        "uses_cloudflare": false,
+        "is_dynamic": true,
+        "row_selector": "tbody tr",
+        "cell_count": 4,
+        "manual": true,
+        "has_pagination": true,
+        "pagination_selector": ".pagination a, .pager a, a[href*='page']"
+    },
+    {
+        "organization": "Pima County",
+        "url": "https://www.pima.gov/199/Solicitations",
+        "confidence": "low",
+        "notes": [
+            "\ud83d\udd32 4 iframe(s) found - may need switching",
+            "\u274c No table found with standard selectors",
+            "\ud83d\udcc4 Pagination detected",
+            "\ud83d\udcf8 Screenshot saved: city_analysis_pima_county.png"
+        ],
+        "uses_cloudflare": false,
+        "is_dynamic": true,
+        "row_selector": "tbody tr",
+        "cell_count": 4,
+        "manual": true,
+        "has_pagination": true,
+        "pagination_selector": ".pagination a, .pager a, a[href*='page']"
+    },
+    {
+        "organization": "Yavapai County",
+        "url": "https://www.yavapaiaz.gov/County-Government/Bids",
+        "confidence": "low",
+        "notes": [
+            "\u274c No table found with standard selectors",
+            "\ud83d\udcc4 Pagination detected",
+            "\ud83d\udcf8 Screenshot saved: city_analysis_yavapai_county.png"
+        ],
+        "uses_cloudflare": false,
+        "is_dynamic": false,
+        "row_selector": "tbody tr",
+        "cell_count": 4,
+        "manual": true,
+        "has_pagination": true,
+        "pagination_selector": ".pagination a, .pager a, a[href*='page']"
+    },
+    {
+        "organization": "Coconino County",
+        "url": "https://www.coconino.az.gov/Bids.aspx",
+        "confidence": "low",
+        "notes": [
+            "\ud83d\udd32 2 iframe(s) found - may need switching",
+            "\u274c No table found with standard selectors",
+            "\ud83d\udcc4 Pagination detected",
+            "\ud83d\udcf8 Screenshot saved: city_analysis_coconino_county.png"
+        ],
+        "uses_cloudflare": false,
+        "is_dynamic": true,
+        "row_selector": "tbody tr",
+        "cell_count": 4,
+        "manual": true,
+        "has_pagination": true,
+        "pagination_selector": ".pagination a, .pager a, a[href*='page']"
+    },
+    {
+        "organization": "Gila County",
+        "url": "https://www.gilacountyaz.gov/government/finance/procurement/current_bids.php",
+        "confidence": "high",
+        "notes": [
+            "\ud83d\udd32 4 iframe(s) found - may need switching",
+            "\u2705 Standard table rows: 36 rows, 5 cells",
+            "\ud83d\udccb Sample: IBR 05082025B | Russell Gulch Landfill Leachat | 09-23-25",
+            "\ud83d\udcf8 Screenshot saved: city_analysis_gila_county.png"
+        ],
+        "uses_cloudflare": false,
+        "is_dynamic": true,
+        "row_selector": "tbody tr",
+        "cell_count": 5,
+        "has_pagination": false
+    },
+    {
+        "organization": "Santa Cruz County",
+        "url": "https://www.santacruzcountyaz.gov/286/Bids-Solicitations",
+        "confidence": "high",
+        "notes": [
+            "\u2705 Standard table rows: 4 rows, 3 cells",
+            "\ud83d\udccb Sample: B-04-25-CO37 | One Stop Comprehensive Center\n | Deadline for Submission is Jul",
+            "\ud83d\udcc4 Pagination detected",
+            "\ud83d\udcf8 Screenshot saved: city_analysis_santa_cruz_county.png"
+        ],
+        "uses_cloudflare": false,
+        "is_dynamic": false,
+        "row_selector": "tbody tr",
+        "cell_count": 3,
+        "has_pagination": true,
+        "pagination_selector": ".pagination a, .pager a, a[href*='page']"
+    },
+    {
+        "organization": "Graham County",
+        "url": "https://www.graham.az.gov/Bids.aspx",
+        "confidence": "low",
+        "notes": [
+            "\ud83d\udd32 1 iframe(s) found - may need switching",
+            "\u274c No table found with standard selectors",
+            "\ud83d\udcc4 Pagination detected",
+            "\ud83d\udcf8 Screenshot saved: city_analysis_graham_county.png"
+        ],
+        "uses_cloudflare": false,
+        "is_dynamic": true,
+        "row_selector": "tbody tr",
+        "cell_count": 4,
+        "manual": true,
+        "has_pagination": true,
+        "pagination_selector": ".pagination a, .pager a, a[href*='page']"
+    },
+    {
+        "organization": "Yuma County",
+        "url": "https://www.yumacountyaz.gov/i-want-to/view-request-for-proposals",
+        "confidence": "high",
+        "notes": [
+            "\ud83d\udd32 1 iframe(s) found - may need switching",
+            "\u2705 Standard table rows: 8 rows, 5 cells",
+            "\ud83d\udccb Sample: YCMedicalPBM2026 | Bundled Medical Program (AZ/US | 09/25/2025 3:53 PM",
+            "\ud83d\udcf8 Screenshot saved: city_analysis_yuma_county.png"
+        ],
+        "uses_cloudflare": false,
+        "is_dynamic": true,
+        "row_selector": "tbody tr",
+        "cell_count": 5,
+        "has_pagination": false
+    }
+]

@@ -98,11 +98,12 @@
     },
     {
         "organization": "Coconino County",
-        "url": "https://www.coconino.az.gov/Bids.aspx",
+        "url": "https://procurement.opengov.com/portal/coconino",
         "row_selector": "div.row, .item",
-        "cell_count": 31,
-        "is_dynamic": false,
+        "cell_count": 75,
+        "is_dynamic": true,
         "manual": false,
+        "uses_cloudflare": true,
         "strategy_name": "div_rows"
     },
     {
@@ -124,11 +125,11 @@
     {
         "organization": "Graham County",
         "url": "https://www.graham.az.gov/Bids.aspx",
-        "row_selector": "div.row, .item",
-        "cell_count": 5,
-        "is_dynamic": false,
+        "row_selector": "table.CivicPlusBids tbody tr",
+        "cell_count": 6,
+        "is_dynamic": true,
         "manual": false,
-        "strategy_name": "div_rows"
+        "note": "CivicPlus Bids.aspx page - dynamic loading"
     },
     {
         "organization": "Yuma County",
@@ -207,13 +208,13 @@
     },
     {
         "organization": "City of Surprise",
-        "url": "https://surpriseaz.gov/277/Procurement",
+        "url": "https://procurement.opengov.com/portal/surpriseaz",
         "row_selector": "div.row, .item",
-        "cell_count": 15,
-        "is_dynamic": false,
+        "cell_count": 75,
+        "is_dynamic": true,
         "manual": false,
-        "strategy_name": "div_rows",
-        "note": "May have outdated data - last update appears to be 2018 bonds"
+        "uses_cloudflare": true,
+        "strategy_name": "div_rows"
     },
     {
         "organization": "City of Flagstaff",
@@ -236,10 +237,10 @@
     {
         "organization": "City of Casa Grande",
         "url": "https://casagrandeaz.gov/Bids.aspx",
-        "row_selector": "div.row, .item",
-        "cell_count": 5,
-        "is_dynamic": false,
+        "row_selector": "table.CivicPlusBids tbody tr",
+        "cell_count": 6,
+        "is_dynamic": true,
         "manual": false,
-        "strategy_name": "div_rows"
+        "note": "CivicPlus Bids.aspx page - dynamic loading"
     }
 ]

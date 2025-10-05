@@ -580,6 +580,412 @@
             },
             "total_rfqs": 47,
             "alerts": []
+        },
+        {
+            "timestamp": "2025-10-02T22:48:58.756496",
+            "cities": {
+                "City of Apache Junction": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Yuma": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pinal County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Florence": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "Town of Queen Creek": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                }
+            },
+            "total_rfqs": 6,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-03T22:58:41.840145",
+            "cities": {
+                "City of Gilbert": {
+                    "rfq_count": 30,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Mesa": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Apache Junction": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Yuma": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pinal County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Town of Florence": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "Town of Queen Creek": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "Maricopa County": {
+                    "rfq_count": 7,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "Pima County": {
+                    "rfq_count": 26,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "Yavapai County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Coconino County": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "Gila County": {
+                    "rfq_count": 10,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Santa Cruz County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Graham County": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "Yuma County": {
+                    "rfq_count": 7,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Phoenix": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Tucson": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Chandler": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "City of Scottsdale": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Glendale": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Tempe": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Peoria": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Surprise": {
+                    "rfq_count": 19,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "City of Flagstaff": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Prescott": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Casa Grande": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                }
+            },
+            "total_rfqs": 141,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-04T08:24:24.514359",
+            "cities": {
+                "Maricopa County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pima County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Tucson": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "City of Scottsdale": {
+                    "rfq_count": 6,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Tempe": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Peoria": {
+                    "rfq_count": 4,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Prescott": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 11,
+            "alerts": [
+                {
+                    "city": "Maricopa County",
+                    "severity": "critical",
+                    "message": "RFQ count dropped 100.0% (7 \u2192 0)",
+                    "pct_change": -100.0
+                },
+                {
+                    "city": "Pima County",
+                    "severity": "critical",
+                    "message": "RFQ count dropped 100.0% (26 \u2192 0)",
+                    "pct_change": -100.0
+                }
+            ]
+        },
+        {
+            "timestamp": "2025-10-04T08:43:33.724886",
+            "cities": {
+                "Maricopa County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pima County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Tempe": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Prescott": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 0,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-04T08:55:09.612542",
+            "cities": {
+                "Maricopa County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pima County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Tempe": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Prescott": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                }
+            },
+            "total_rfqs": 12,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-04T09:06:13.605156",
+            "cities": {
+                "Maricopa County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pima County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Tempe": {
+                    "rfq_count": 11,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Prescott": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                }
+            },
+            "total_rfqs": 12,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-04T09:17:13.242509",
+            "cities": {
+                "Maricopa County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pima County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 0,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-04T09:19:55.289384",
+            "cities": {
+                "Maricopa County": {
+                    "rfq_count": 12,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Pima County": {
+                    "rfq_count": 12,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 24,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-04T22:22:00.514393",
+            "cities": {
+                "City of Gilbert": {
+                    "rfq_count": 30,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 30,
+            "alerts": []
         }
     ]
 }

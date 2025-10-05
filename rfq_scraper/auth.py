@@ -13,7 +13,7 @@ security = HTTPBasic()
 # You can also set via environment variables for better security
 USERNAME = os.getenv("RFQ_USERNAME", "admin")
 # Password: "changeme123" (hashed with SHA256)
-PASSWORD_HASH = os.getenv("RFQ_PASSWORD_HASH", "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92")
+PASSWORD_HASH = os.getenv("RFQ_PASSWORD_HASH", "494a715f7e9b4071aca61bac42ca858a309524e5864f0920030862a4ae7589be")
 
 def hash_password(password: str) -> str:
     """Hash a password using SHA256"""

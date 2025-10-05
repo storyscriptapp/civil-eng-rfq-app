@@ -1,0 +1,257 @@
+[
+    {
+        "organization": "City of Gilbert",
+        "url": "https://www.gilbertaz.gov/how-do-i/view/rfp-cip-open-bids",
+        "confidence": "high",
+        "notes": [
+            "\u2705 Full table tbody path: 20 rows, 4 cells",
+            "\ud83d\udccb Sample: 326000025 | Urban Lakes Renovation / Irrig | 10/09/2025 3:00 PM",
+            "\ud83d\udcc4 Pagination detected",
+            "\ud83d\udcf8 Screenshot: compare_city_of_gilbert.png"
+        ],
+        "detected": {
+            "uses_cloudflare": false,
+            "is_dynamic": false,
+            "row_selector": "table tbody tr",
+            "cell_count": 4,
+            "has_pagination": true,
+            "pagination_selector": ".pagination a, .pager a, a[href*='page']"
+        },
+        "existing": {
+            "organization": "City of Gilbert",
+            "url": "https://www.gilbertaz.gov/how-do-i/view/rfp-cip-open-bids",
+            "row_selector": "table tbody tr",
+            "cell_count": 4,
+            "is_dynamic": false,
+            "manual": false,
+            "has_pagination": true,
+            "pagination_selector": ".pagination a, .pager a, a[href*='page'], a[class*='next'], a[rel='next']",
+            "skip_wait": true
+        },
+        "matches": {
+            "cloudflare": "\u274c Mismatch: existing=None, detected=False",
+            "is_dynamic": "\u2705 Match",
+            "row_selector": "\u2705 Exact match",
+            "cell_count": "\u2705 Match",
+            "has_pagination": "\u2705 Match"
+        }
+    },
+    {
+        "organization": "City of Mesa",
+        "url": "https://www.mesaaz.gov/Business-Development/Engineering/Architectural-Engineering-Design-Opportunities",
+        "confidence": "high",
+        "notes": [
+            "\ud83d\udd32 3 iframe(s) found - may need switching",
+            "\u2705 Full table tbody path: 11 rows, 3 cells",
+            "\ud83d\udccb Sample: Mesa Arts Center Lighting and  |  July 31, 2025, by 2 p.m. | MAC Lighting System Conceptual",
+            "\ud83d\udcc4 Pagination detected",
+            "\ud83d\udcf8 Screenshot: compare_city_of_mesa.png"
+        ],
+        "detected": {
+            "uses_cloudflare": false,
+            "is_dynamic": true,
+            "row_selector": "table tbody tr",
+            "cell_count": 3,
+            "has_pagination": true,
+            "pagination_selector": ".pagination a, .pager a, a[href*='page']"
+        },
+        "existing": {
+            "organization": "City of Mesa",
+            "url": "https://www.mesaaz.gov/Business-Development/Engineering/Architectural-Engineering-Design-Opportunities",
+            "row_selector": "table tbody tr",
+            "cell_count": 3,
+            "is_dynamic": false,
+            "manual": false
+        },
+        "matches": {
+            "cloudflare": "\u274c Mismatch: existing=None, detected=False",
+            "is_dynamic": "\u274c Mismatch: existing=False, detected=True",
+            "row_selector": "\u2705 Exact match",
+            "cell_count": "\u2705 Match",
+            "has_pagination": "\u26a0\ufe0f Different: existing=None, detected=True"
+        }
+    },
+    {
+        "organization": "City of Apache Junction",
+        "url": "https://www.apachejunctionaz.gov/826/Current-Solicitations",
+        "confidence": "high",
+        "notes": [
+            "\ud83d\udd32 2 iframe(s) found - may need switching",
+            "\u2705 Bootstrap rows: 24 rows, 5 cells",
+            "\ud83d\udccb Sample: Search | Search | Search",
+            "\ud83d\udcc4 Pagination detected",
+            "\ud83d\udcf8 Screenshot: compare_city_of_apache_junction.png"
+        ],
+        "detected": {
+            "uses_cloudflare": false,
+            "is_dynamic": true,
+            "row_selector": ".row",
+            "cell_count": 5,
+            "has_pagination": true,
+            "pagination_selector": ".pagination a, .pager a, a[href*='page']"
+        },
+        "existing": {
+            "organization": "City of Apache Junction",
+            "url": "https://www.apachejunctionaz.gov/826/Current-Solicitations",
+            "row_selector": "table.tabHome tbody tr",
+            "cell_count": 5,
+            "is_dynamic": true,
+            "manual": false
+        },
+        "matches": {
+            "cloudflare": "\u274c Mismatch: existing=None, detected=False",
+            "is_dynamic": "\u2705 Match",
+            "row_selector": "\u26a0\ufe0f Different: existing='table.tabHome tbody tr', detected='.row'",
+            "cell_count": "\u2705 Match",
+            "has_pagination": "\u26a0\ufe0f Different: existing=None, detected=True"
+        }
+    },
+    {
+        "organization": "City of Yuma",
+        "url": "https://yumaaz.bonfirehub.com/portal/?tab=openOpportunities",
+        "confidence": "high",
+        "notes": [
+            "\u2705 Bonfire platform detected"
+        ],
+        "detected": {
+            "uses_cloudflare": false,
+            "row_selector": "tbody tr",
+            "cell_count": 3,
+            "is_dynamic": true,
+            "has_pagination": true,
+            "pagination_selector": ".pagination a, a[aria-label*='Next'], button[aria-label*='Next']"
+        },
+        "existing": {
+            "organization": "City of Yuma",
+            "url": "https://yumaaz.bonfirehub.com/portal/?tab=openOpportunities",
+            "row_selector": "table tbody tr",
+            "cell_count": 3,
+            "is_dynamic": true,
+            "manual": false,
+            "has_pagination": true,
+            "pagination_selector": ".pagination a, a[aria-label*='Next'], button[aria-label*='Next']"
+        },
+        "matches": {
+            "cloudflare": "\u274c Mismatch: existing=None, detected=False",
+            "row_selector": "\u2705 Match (Bonfire)"
+        }
+    },
+    {
+        "organization": "Pinal County",
+        "url": "https://pinalcountyaz.bonfirehub.com/portal/?tab=openOpportunities",
+        "confidence": "high",
+        "notes": [
+            "\u2705 Bonfire platform detected"
+        ],
+        "detected": {
+            "uses_cloudflare": false,
+            "row_selector": "tbody tr",
+            "cell_count": 3,
+            "is_dynamic": true,
+            "has_pagination": true,
+            "pagination_selector": ".pagination a, a[aria-label*='Next'], button[aria-label*='Next']"
+        },
+        "existing": {
+            "organization": "Pinal County",
+            "url": "https://pinalcountyaz.bonfirehub.com/portal/?tab=openOpportunities",
+            "row_selector": "table tbody tr",
+            "cell_count": 3,
+            "is_dynamic": true,
+            "manual": false,
+            "has_pagination": true,
+            "pagination_selector": ".pagination a, a[aria-label*='Next'], button[aria-label*='Next']"
+        },
+        "matches": {
+            "cloudflare": "\u274c Mismatch: existing=None, detected=False",
+            "row_selector": "\u2705 Match (Bonfire)"
+        }
+    },
+    {
+        "organization": "Maricopa County",
+        "url": "https://www.maricopa.gov/2190/Solicitations",
+        "confidence": "error",
+        "notes": [
+            "\u274c Error: HTTPConnectionPool(host='localhost', port=56606): Max retries exceeded with url: /session/c5e38a7105badce3b8542806ae09c473/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001FB7B647820>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"
+        ],
+        "detected": {},
+        "existing": {},
+        "matches": {}
+    },
+    {
+        "organization": "Pima County",
+        "url": "https://www.pima.gov/199/Solicitations",
+        "confidence": "error",
+        "notes": [
+            "\u274c Error: HTTPConnectionPool(host='localhost', port=56606): Max retries exceeded with url: /session/c5e38a7105badce3b8542806ae09c473/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001FB7C2F0160>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"
+        ],
+        "detected": {},
+        "existing": {},
+        "matches": {}
+    },
+    {
+        "organization": "Yavapai County",
+        "url": "https://www.yavapaiaz.gov/County-Government/Bids",
+        "confidence": "error",
+        "notes": [
+            "\u274c Error: HTTPConnectionPool(host='localhost', port=56606): Max retries exceeded with url: /session/c5e38a7105badce3b8542806ae09c473/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001FB7B6DBCE0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"
+        ],
+        "detected": {},
+        "existing": {},
+        "matches": {}
+    },
+    {
+        "organization": "Coconino County",
+        "url": "https://www.coconino.az.gov/Bids.aspx",
+        "confidence": "error",
+        "notes": [
+            "\u274c Error: HTTPConnectionPool(host='localhost', port=56606): Max retries exceeded with url: /session/c5e38a7105badce3b8542806ae09c473/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001FB7B6D9F20>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"
+        ],
+        "detected": {},
+        "existing": {},
+        "matches": {}
+    },
+    {
+        "organization": "Gila County",
+        "url": "https://www.gilacountyaz.gov/government/finance/procurement/current_bids.php",
+        "confidence": "error",
+        "notes": [
+            "\u274c Error: HTTPConnectionPool(host='localhost', port=56606): Max retries exceeded with url: /session/c5e38a7105badce3b8542806ae09c473/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001FB7C2F0E20>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"
+        ],
+        "detected": {},
+        "existing": {},
+        "matches": {}
+    },
+    {
+        "organization": "Santa Cruz County",
+        "url": "https://www.santacruzcountyaz.gov/286/Bids-Solicitations",
+        "confidence": "error",
+        "notes": [
+            "\u274c Error: HTTPConnectionPool(host='localhost', port=56606): Max retries exceeded with url: /session/c5e38a7105badce3b8542806ae09c473/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001FB7C2F17B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"
+        ],
+        "detected": {},
+        "existing": {},
+        "matches": {}
+    },
+    {
+        "organization": "Graham County",
+        "url": "https://www.graham.az.gov/Bids.aspx",
+        "confidence": "error",
+        "notes": [
+            "\u274c Error: HTTPConnectionPool(host='localhost', port=56606): Max retries exceeded with url: /session/c5e38a7105badce3b8542806ae09c473/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001FB7C2F2140>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"
+        ],
+        "detected": {},
+        "existing": {},
+        "matches": {}
+    },
+    {
+        "organization": "Yuma County",
+        "url": "https://www.yumacountyaz.gov/i-want-to/view-request-for-proposals",
+        "confidence": "error",
+        "notes": [
+            "\u274c Error: HTTPConnectionPool(host='localhost', port=56606): Max retries exceeded with url: /session/c5e38a7105badce3b8542806ae09c473/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001FB7C2F2AD0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"
+        ],
+        "detected": {},
+        "existing": {},
+        "matches": {}
+    }
+]

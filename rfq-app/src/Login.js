@@ -15,7 +15,7 @@ function Login({ onLogin }) {
         try {
             // Test authentication by trying to access a protected endpoint
             const credentials = btoa(`${username}:${password}`);
-            const response = await fetch('http://localhost:8000/health', {
+            const response = await fetch('http://localhost:8000/verify', {
                 headers: {
                     'Authorization': `Basic ${credentials}`
                 }
