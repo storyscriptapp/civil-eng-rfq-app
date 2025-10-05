@@ -100,10 +100,10 @@
         "organization": "Coconino County",
         "url": "https://coconino.ionwave.net/SourcingEvents.aspx?SourceType=1",
         "row_selector": "table.rgMasterTable tbody tr:not(.rgNoRecords)",
-        "cell_count": 6,
+        "cell_count": 7,
         "is_dynamic": true,
         "manual": false,
-        "note": "IonWave platform - dynamic table"
+        "note": "IonWave platform - dynamic table with 7 columns"
     },
     {
         "organization": "Gila County",
@@ -236,10 +236,10 @@
     {
         "organization": "City of Casa Grande",
         "url": "https://casagrandeaz.gov/Bids.aspx",
-        "row_selector": "table.CivicPlusBids tbody tr",
-        "cell_count": 6,
+        "row_selector": "div.listItemsRow.bid",
+        "cell_count": 1,
         "is_dynamic": true,
         "manual": false,
-        "note": "CivicPlus Bids.aspx page - dynamic loading"
+        "note": "CivicPlus Bids.aspx page - div-based layout, not table"
     }
 ]

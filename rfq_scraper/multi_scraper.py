@@ -322,6 +322,7 @@ for site_idx, site in enumerate(sites):
                     # BidNet Direct sites (Maricopa, Pima) have single-cell structure with nested divs
                     is_bidnet_direct = "bidnetdirect" in url.lower()
                     is_bonfire = "bonfire" in url.lower()
+                    is_casa_grande = org == "City of Casa Grande"
                     
                     if is_bidnet_direct and cell_count == 1:
                         # BidNet Direct: All data in one cell with nested divs
@@ -347,6 +348,54 @@ for site_idx, site in enumerate(sites):
                         documents = []
                         status = "Open"
                         print(f"✅ BidNet Direct: {rfp_number} - {title[:50]}...")
+                    
+                    elif is_casa_grande and cell_count == 1:
+                        # Casa Grande: div.listItemsRow.bid with nested structure
+                        # div.bidTitle contains title link and bid number
+                        # div.bidStatus contains status and due date
+                        try:
+                            # Get title and link from div.bidTitle a
+                            title_elem = row.find_element(By.CSS_SELECTOR, "div.bidTitle a")
+                            title = title_elem.text.strip()
+                            link = title_elem.get_attribute("href")
+                            # Make link absolute
+                            if link and not link.startswith('http'):
+                                link = f"https://casagrandeaz.gov/{link}"
+                        except:
+                            pass  # Already extracted above
+                        
+                        try:
+                            # Get bid number from span with "Bid No."
+                            bid_spans = row.find_elements(By.CSS_SELECTOR, "div.bidTitle span")
+                            for span in bid_spans:
+                                text = span.text.strip()
+                                if "Bid No." in text:
+                                    rfp_number = text.replace("Bid No.", "").strip()
+                                    break
+                            else:
+                                rfp_number = "N/A"
+                        except:
+                            rfp_number = "N/A"
+                        
+                        try:
+                            # Get due date - it's in the second div inside bidStatus
+                            bid_status_divs = row.find_elements(By.CSS_SELECTOR, "div.bidStatus > div")
+                            if len(bid_status_divs) >= 2:
+                                # Second div contains status and date as spans
+                                date_spans = bid_status_divs[1].find_elements(By.TAG_NAME, "span")
+                                if len(date_spans) >= 2:
+                                    due_date = date_spans[1].text.strip()
+                                else:
+                                    due_date = "N/A"
+                            else:
+                                due_date = "N/A"
+                        except Exception as e:
+                            print(f"⚠️  Error extracting Casa Grande date: {e}")
+                            due_date = "N/A"
+                        
+                        documents = []
+                        status = "Open"
+                        print(f"✅ Casa Grande: {rfp_number} - {title[:50]}...")
                         
                     elif is_bonfire:
                         # Bonfire structure: cell[0]=Status, cell[1]=RFP#, cell[2]=Title, cell[3]=Due Date
