@@ -45,8 +45,11 @@ if args.cities:
 checkpoint = ScraperCheckpoint()
 
 # Handle checkpoint flags
-if args.fresh:
+if args.fresh or args.cities:
+    # Reset checkpoint when scraping specific cities (--cities) or when --fresh is used
     checkpoint.reset()
+    if args.cities:
+        print("🔄 Starting fresh - checkpoint reset for selected cities\n")
 elif args.resume:
     resume_info = checkpoint.get_resume_info()
     if resume_info["should_resume"]:

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './CitiesList.css';
 
-function CitiesList({ onCitySelect, onBack }) {
+function CitiesList({ auth, onCitySelect, onBack }) {
   const [cities, setCities] = useState([]);
   const [selectedCities, setSelectedCities] = useState(new Set());
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
@@ -75,7 +75,10 @@ function CitiesList({ onCitySelect, onBack }) {
     try {
       const response = await fetch('http://localhost:8000/run_scraper', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${auth}`
+        },
         body: JSON.stringify({ cities: citiesList })
       });
 

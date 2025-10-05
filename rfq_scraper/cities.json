@@ -98,13 +98,12 @@
     },
     {
         "organization": "Coconino County",
-        "url": "https://procurement.opengov.com/portal/coconino",
-        "row_selector": "div.row, .item",
-        "cell_count": 75,
+        "url": "https://coconino.ionwave.net/SourcingEvents.aspx?SourceType=1",
+        "row_selector": "table.rgMasterTable tbody tr:not(.rgNoRecords)",
+        "cell_count": 6,
         "is_dynamic": true,
         "manual": false,
-        "uses_cloudflare": true,
-        "strategy_name": "div_rows"
+        "note": "IonWave platform - dynamic table"
     },
     {
         "organization": "Gila County",

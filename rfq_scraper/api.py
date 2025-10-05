@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 import os
+import sys
 import subprocess
 import json
 import re
@@ -90,13 +91,11 @@ async def verify_auth(username: str = Depends(get_current_username)):
 @app.post("/run_scraper")
 async def run_scraper(data: dict = None, username: str = Depends(get_current_username)):
     """Run scraper for all cities or selected cities (requires authentication)"""
-    script_dir = os.path.dirname(__file__)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     script_path = os.path.join(script_dir, "multi_scraper.py")
     
-    # Get the Python executable from the current environment
-    python_exe = os.path.join(os.path.dirname(os.path.dirname(script_dir)), "venv", "Scripts", "python.exe")
-    if not os.path.exists(python_exe):
-        python_exe = "python"  # Fallback to system Python
+    # Use the same Python interpreter that's running the API
+    python_exe = sys.executable
     
     if data and data.get("cities"):
         # Run scraper for selected cities

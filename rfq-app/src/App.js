@@ -216,6 +216,7 @@ function App() {
     if (currentView === 'cities') {
         return (
             <CitiesList 
+                auth={auth}
                 onCitySelect={handleCitySelect}
                 onBack={() => setCurrentView('rfqs')}
             />

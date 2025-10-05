@@ -986,6 +986,68 @@
             },
             "total_rfqs": 30,
             "alerts": []
+        },
+        {
+            "timestamp": "2025-10-04T23:49:09.133623",
+            "cities": {
+                "Pima County": {
+                    "rfq_count": 12,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Coconino County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "Graham County": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Surprise": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "div_rows"
+                },
+                "City of Casa Grande": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 13,
+            "alerts": [
+                {
+                    "city": "Coconino County",
+                    "severity": "critical",
+                    "message": "RFQ count dropped 100.0% (2 \u2192 0)",
+                    "pct_change": -100.0
+                },
+                {
+                    "city": "Graham County",
+                    "severity": "critical",
+                    "message": "RFQ count dropped 100.0% (11 \u2192 0)",
+                    "pct_change": -100.0
+                },
+                {
+                    "city": "City of Surprise",
+                    "severity": "critical",
+                    "message": "RFQ count dropped 94.7% (19 \u2192 1)",
+                    "pct_change": -94.73684210526315
+                },
+                {
+                    "city": "City of Casa Grande",
+                    "severity": "critical",
+                    "message": "RFQ count dropped 100.0% (11 \u2192 0)",
+                    "pct_change": -100.0
+                }
+            ]
         }
     ]
 }
