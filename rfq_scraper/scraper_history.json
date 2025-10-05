@@ -1048,6 +1048,156 @@
                     "pct_change": -100.0
                 }
             ]
+        },
+        {
+            "timestamp": "2025-10-05T00:03:23.323782",
+            "cities": {
+                "Maricopa County": {
+                    "rfq_count": 12,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Coconino County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Casa Grande": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 13,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-05T00:13:02.663178",
+            "cities": {
+                "Maricopa County": {
+                    "rfq_count": 12,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Coconino County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Casa Grande": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 13,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-05T00:17:21.960044",
+            "cities": {
+                "Maricopa County": {
+                    "rfq_count": 12,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Coconino County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Casa Grande": {
+                    "rfq_count": 0,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 13,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-05T00:19:58.393622",
+            "cities": {
+                "Maricopa County": {
+                    "rfq_count": 12,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Coconino County": {
+                    "rfq_count": 1,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Casa Grande": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 15,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-05T00:22:45.474834",
+            "cities": {
+                "Maricopa County": {
+                    "rfq_count": 12,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Coconino County": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Casa Grande": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 16,
+            "alerts": []
+        },
+        {
+            "timestamp": "2025-10-05T00:24:56.270395",
+            "cities": {
+                "Maricopa County": {
+                    "rfq_count": 12,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "Coconino County": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                },
+                "City of Casa Grande": {
+                    "rfq_count": 2,
+                    "status": "success",
+                    "error": null,
+                    "strategy_used": "default"
+                }
+            },
+            "total_rfqs": 16,
+            "alerts": []
         }
     ]
 }
