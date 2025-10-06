@@ -31,7 +31,8 @@ function App() {
     const [selectedCity, setSelectedCity] = useState(null);
     const [healthData, setHealthData] = useState(null);
 
-    useEffect(() => {
+    // Function to fetch RFQs (can be called from multiple places)
+    const fetchRfqs = () => {
         fetch('http://localhost:8000/rfqs')
             .then(res => res.json())
             .then(data => {
@@ -39,6 +40,10 @@ function App() {
                 setRfqs(data);
             })
             .catch(err => console.error('Error fetching RFQs:', err));
+    };
+
+    useEffect(() => {
+        fetchRfqs();
         fetch('/rfq_scraper/cities.json')
             .then(res => res.json())
             .then(data => setCities(data))
