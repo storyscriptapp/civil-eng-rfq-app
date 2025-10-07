@@ -179,6 +179,46 @@ function App() {
             .catch(err => console.error('Error updating work type:', err));
     };
 
+    const syncDatabase = () => {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.db';
+        fileInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!window.confirm(`Upload database file "${file.name}" to server? This will replace the current database (backup will be created).`)) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/sync_database`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Basic ${auth}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`✅ ${result.message}`);
+                    // Refresh the RFQs list
+                    fetchRfqs();
+                } else {
+                    alert(`❌ Sync failed: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`❌ Sync failed: ${error.message}`);
+            }
+        };
+        fileInput.click();
+    };
+
     // Apply filters
     const filteredRfqs = rfqs.filter(rfq => {
         // Filter by work type
@@ -272,6 +312,13 @@ function App() {
                         className="btn btn-info"
                     >
                         📍 View Cities ({organizations.length})
+                    </button>
+                    <button 
+                        className="btn btn-success" 
+                        onClick={syncDatabase}
+                        title="Upload database from dev laptop to this server"
+                    >
+                        🔄 Sync Database
                     </button>
                     <button className="btn btn-primary" onClick={runScraper}>
                         <i className="bi bi-arrow-clockwise"></i> Run Scraper

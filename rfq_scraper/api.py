@@ -8,7 +8,8 @@ import sys
 import subprocess
 import json
 import re
-from datetime import date
+import shutil
+from datetime import date, datetime
 from PIL import Image
 import pytesseract
 import cv2
@@ -682,6 +683,63 @@ async def get_city_profile(city_name: str):
         return profile
     except Exception as e:
         return {"error": str(e)}
+
+@app.post("/sync_database")
+async def sync_database(
+    file: UploadFile = File(...),
+    username: str = Depends(get_current_username)
+):
+    """
+    Upload and replace the database file from dev environment to production.
+    Creates a backup of the existing database before replacing.
+    """
+    try:
+        db_path = os.path.join(os.path.dirname(__file__), "rfq_tracking.db")
+        
+        # Verify uploaded file is a SQLite database
+        contents = await file.read()
+        if not contents.startswith(b'SQLite format 3'):
+            return {"success": False, "error": "Invalid file: Not a SQLite database"}
+        
+        # Create backup of existing database
+        if os.path.exists(db_path):
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_path = os.path.join(
+                os.path.dirname(__file__), 
+                f"rfq_tracking_backup_{timestamp}.db"
+            )
+            shutil.copy2(db_path, backup_path)
+            print(f"✅ Backup created: {backup_path}")
+        
+        # Write new database
+        with open(db_path, 'wb') as f:
+            f.write(contents)
+        
+        # Verify the new database is valid
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM jobs")
+            job_count = cursor.fetchone()[0]
+            conn.close()
+            
+            return {
+                "success": True,
+                "message": f"Database synced successfully! {job_count} jobs in database.",
+                "job_count": job_count,
+                "synced_at": datetime.now().isoformat()
+            }
+        except Exception as verify_error:
+            # Restore backup if verification fails
+            if os.path.exists(backup_path):
+                shutil.copy2(backup_path, db_path)
+            return {
+                "success": False,
+                "error": f"Database verification failed: {verify_error}. Backup restored."
+            }
+            
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 # Catch-all route to serve React app for any non-API routes
 @app.get("/{path:path}")
