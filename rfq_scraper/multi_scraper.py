@@ -8,6 +8,7 @@ import json
 from datetime import date
 import time
 import os
+import tempfile
 import argparse
 from PIL import Image
 import pytesseract
@@ -79,7 +80,23 @@ options.add_argument("--disable-software-rasterizer")
 
 def create_driver():
     """Create a new Chrome driver instance"""
-    driver = webdriver.Chrome(options=options)
+    # Create a copy of options to avoid modifying the global options
+    driver_options = Options()
+    driver_options.add_argument("--no-sandbox")
+    driver_options.add_argument("--disable-dev-shm-usage")
+    driver_options.add_argument("--disable-blink-features=AutomationControlled")
+    driver_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    driver_options.add_experimental_option('useAutomationExtension', False)
+    driver_options.headless = False
+    driver_options.add_argument("--window-size=1920,1080")
+    driver_options.add_argument("--disable-gpu")
+    driver_options.add_argument("--disable-software-rasterizer")
+    
+    # Use a unique temporary directory for user data to avoid conflicts
+    temp_dir = tempfile.mkdtemp(prefix="chrome_user_data_")
+    driver_options.add_argument(f"--user-data-dir={temp_dir}")
+    
+    driver = webdriver.Chrome(options=driver_options)
     driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
     return driver
 
@@ -88,6 +105,11 @@ def create_undetected_driver():
     uc_options = uc.ChromeOptions()
     uc_options.add_argument("--window-size=1920,1080")
     uc_options.add_argument("--disable-blink-features=AutomationControlled")
+    
+    # Use a unique temporary directory for user data to avoid conflicts
+    temp_dir = tempfile.mkdtemp(prefix="chrome_uc_user_data_")
+    uc_options.add_argument(f"--user-data-dir={temp_dir}")
+    
     # Use version_main=140 to match Chrome 140.x
     driver = uc.Chrome(options=uc_options, version_main=140)
     return driver
