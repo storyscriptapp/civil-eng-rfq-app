@@ -93,10 +93,9 @@ def create_driver():
         driver_options.add_argument("--disable-gpu")
         driver_options.add_argument("--disable-software-rasterizer")
         
-        # Use a unique temporary directory for user data to avoid conflicts
-        temp_dir = tempfile.mkdtemp(prefix="chrome_user_data_")
-        print(f"🔧 Creating Chrome driver with temp dir: {temp_dir}")
-        driver_options.add_argument(f"--user-data-dir={temp_dir}")
+        # Don't specify user-data-dir - let Chrome manage sessions automatically
+        # This avoids conflicts on some Windows systems
+        print(f"🔧 Creating Chrome driver (auto-managed session)")
         
         driver = webdriver.Chrome(options=driver_options)
         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
@@ -112,9 +111,8 @@ def create_undetected_driver():
     uc_options.add_argument("--window-size=1920,1080")
     uc_options.add_argument("--disable-blink-features=AutomationControlled")
     
-    # Use a unique temporary directory for user data to avoid conflicts
-    temp_dir = tempfile.mkdtemp(prefix="chrome_uc_user_data_")
-    uc_options.add_argument(f"--user-data-dir={temp_dir}")
+    # Don't specify user-data-dir - let Chrome manage sessions automatically
+    print(f"🔧 Creating undetected Chrome driver (auto-managed session)")
     
     # Use version_main=140 to match Chrome 140.x
     driver = uc.Chrome(options=uc_options, version_main=140)
