@@ -114,7 +114,9 @@ def create_undetected_driver():
     driver = uc.Chrome(options=uc_options, version_main=140)
     return driver
 
-driver = create_driver()
+# Don't create driver at module level - it will be created when needed for each city
+# Initialize as None and create fresh drivers for each city
+driver = None
 
 data = []
 
@@ -672,12 +674,12 @@ health_data = health_monitor.get_health_data()
 with open("scraper_health.json", "w") as f:
     json.dump(health_data, f, indent=2)
 
-# Safe cleanup
-try:
-    driver.switch_to.default_content()
-except:
-    pass
-try:
-    driver.quit()
-except:
-    pass
+# Safe cleanup - not needed since drivers are created and cleaned up per-city
+# try:
+#     driver.switch_to.default_content()
+# except:
+#     pass
+# try:
+#     driver.quit()
+# except:
+#     pass
