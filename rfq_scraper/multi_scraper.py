@@ -80,25 +80,31 @@ options.add_argument("--disable-software-rasterizer")
 
 def create_driver():
     """Create a new Chrome driver instance"""
-    # Create a copy of options to avoid modifying the global options
-    driver_options = Options()
-    driver_options.add_argument("--no-sandbox")
-    driver_options.add_argument("--disable-dev-shm-usage")
-    driver_options.add_argument("--disable-blink-features=AutomationControlled")
-    driver_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    driver_options.add_experimental_option('useAutomationExtension', False)
-    driver_options.headless = False
-    driver_options.add_argument("--window-size=1920,1080")
-    driver_options.add_argument("--disable-gpu")
-    driver_options.add_argument("--disable-software-rasterizer")
-    
-    # Use a unique temporary directory for user data to avoid conflicts
-    temp_dir = tempfile.mkdtemp(prefix="chrome_user_data_")
-    driver_options.add_argument(f"--user-data-dir={temp_dir}")
-    
-    driver = webdriver.Chrome(options=driver_options)
-    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-    return driver
+    try:
+        # Create a copy of options to avoid modifying the global options
+        driver_options = Options()
+        driver_options.add_argument("--no-sandbox")
+        driver_options.add_argument("--disable-dev-shm-usage")
+        driver_options.add_argument("--disable-blink-features=AutomationControlled")
+        driver_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        driver_options.add_experimental_option('useAutomationExtension', False)
+        driver_options.headless = False
+        driver_options.add_argument("--window-size=1920,1080")
+        driver_options.add_argument("--disable-gpu")
+        driver_options.add_argument("--disable-software-rasterizer")
+        
+        # Use a unique temporary directory for user data to avoid conflicts
+        temp_dir = tempfile.mkdtemp(prefix="chrome_user_data_")
+        print(f"🔧 Creating Chrome driver with temp dir: {temp_dir}")
+        driver_options.add_argument(f"--user-data-dir={temp_dir}")
+        
+        driver = webdriver.Chrome(options=driver_options)
+        driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+        print(f"✅ Chrome driver created successfully")
+        return driver
+    except Exception as e:
+        print(f"❌ FAILED to create Chrome driver: {e}")
+        raise  # Re-raise to stop execution
 
 def create_undetected_driver():
     """Create undetected Chrome driver for Cloudflare-protected sites"""
@@ -157,15 +163,26 @@ for site_idx, site in enumerate(sites):
                 pass
         
         # Create new driver (undetected for Cloudflare sites, regular otherwise)
-        if uses_cloudflare:
-            print(f"🛡️ {org} uses Cloudflare - using undetected driver...")
-            driver = create_undetected_driver()
-            time.sleep(2)  # Give the undetected driver time to start
-        else:
-            driver = create_driver()
+        try:
+            if uses_cloudflare:
+                print(f"🛡️ {org} uses Cloudflare - using undetected driver...")
+                driver = create_undetected_driver()
+                time.sleep(2)  # Give the undetected driver time to start
+            else:
+                driver = create_driver()
+        except Exception as driver_error:
+            print(f"❌ CRITICAL: Failed to create driver for {org}: {driver_error}")
+            print(f"❌ Cannot continue scraping. Check Chrome/ChromeDriver installation.")
+            raise  # Stop the entire scrape
         
         print(f"Scraping {org}...")
-        driver.get(url)
+        print(f"🌐 Navigating to: {url}")
+        try:
+            driver.get(url)
+            print(f"✅ Successfully loaded: {url}")
+        except Exception as nav_error:
+            print(f"❌ Failed to navigate to {url}: {nav_error}")
+            raise
         
         # Give Cloudflare time to verify the browser
         if uses_cloudflare:
