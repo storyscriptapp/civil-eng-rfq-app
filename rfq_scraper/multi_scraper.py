@@ -148,26 +148,21 @@ for site_idx, site in enumerate(sites):
         time.sleep(2)
 
     try:
-        # Switch to undetected driver for Cloudflare-protected sites
-        if uses_cloudflare:
-            print(f"🛡️ {org} uses Cloudflare - switching to undetected driver...")
+        # Create fresh driver for each city to avoid conflicts
+        # Close previous driver if it exists
+        if driver is not None:
             try:
                 driver.quit()
             except:
                 pass
+        
+        # Create new driver (undetected for Cloudflare sites, regular otherwise)
+        if uses_cloudflare:
+            print(f"🛡️ {org} uses Cloudflare - using undetected driver...")
             driver = create_undetected_driver()
             time.sleep(2)  # Give the undetected driver time to start
         else:
-            # Check if browser is still alive, restart if needed
-            try:
-                driver.current_url  # This will fail if session is dead
-            except:
-                print(f"⚠️ Browser session died, restarting...")
-                try:
-                    driver.quit()
-                except:
-                    pass
-                driver = create_driver()
+            driver = create_driver()
         
         print(f"Scraping {org}...")
         driver.get(url)
@@ -614,16 +609,6 @@ for site_idx, site in enumerate(sites):
         except Exception as ocr_e:
             print(f"OCR failed for {org}: {ocr_e}")
     
-    # Switch back to regular driver after Cloudflare sites
-    if uses_cloudflare:
-        print(f"✓ Finished {org}, switching back to regular driver...")
-        try:
-            driver.quit()
-        except:
-            pass
-        driver = create_driver()
-        time.sleep(1)
-    
     # Process and save this city's data immediately
     if city_data:
         print(f"💾 Saving {len(city_data)} RFQs for {org} to database...")
@@ -638,6 +623,14 @@ for site_idx, site in enumerate(sites):
     
     # Mark checkpoint after each city (success or failure)
     checkpoint.mark_city_complete(site_idx, org, rfq_count_for_city)
+    
+    # Clean up driver after this city
+    if driver is not None:
+        try:
+            driver.quit()
+        except Exception as cleanup_error:
+            print(f"⚠️ Error cleaning up driver for {org}: {cleanup_error}")
+        driver = None  # Reset for next city
 
 # Final processing - already done incrementally above
 print(f"\n📊 Total: {len(data)} RFQs from all cities")
