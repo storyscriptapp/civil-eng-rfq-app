@@ -1,5 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import sqlite3
 import os
 import sys
@@ -18,11 +20,16 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "http://localhost:8000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve static files from React build
+build_path = os.path.join(os.path.dirname(__file__), "..", "rfq-app", "build")
+if os.path.exists(build_path):
+    app.mount("/static", StaticFiles(directory=os.path.join(build_path, "static")), name="static")
 
 @app.get("/rfqs")
 async def get_rfqs():
@@ -675,3 +682,26 @@ async def get_city_profile(city_name: str):
         return profile
     except Exception as e:
         return {"error": str(e)}
+
+# Catch-all route to serve React app for any non-API routes
+@app.get("/{path:path}")
+async def serve_react_app(path: str):
+    """
+    Serve the React app for all routes that don't match API endpoints.
+    This allows React Router to handle client-side routing.
+    """
+    # Check if the file exists in the build directory
+    file_path = os.path.join(build_path, path)
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        return FileResponse(file_path)
+    
+    # Otherwise, serve index.html (for React Router)
+    index_path = os.path.join(build_path, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    
+    # If no build exists, return helpful error
+    return {
+        "error": "Frontend not built",
+        "message": "Run 'npm run build' in the rfq-app directory to create production build"
+    }

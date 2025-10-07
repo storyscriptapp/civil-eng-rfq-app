@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import API_BASE_URL from './config';
 import './Login.css';
 
 function Login({ onLogin }) {
@@ -15,7 +16,7 @@ function Login({ onLogin }) {
         try {
             // Test authentication by trying to access a protected endpoint
             const credentials = btoa(`${username}:${password}`);
-            const response = await fetch('http://localhost:8000/verify', {
+            const response = await fetch(`${API_BASE_URL}/verify`, {
                 headers: {
                     'Authorization': `Basic ${credentials}`
                 }

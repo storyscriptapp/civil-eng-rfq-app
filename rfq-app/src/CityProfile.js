@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './CityProfile.css';
+import API_BASE_URL from './config';
 
 function CityProfile({ cityName, onBack, onViewJobs }) {
   const [cityData, setCityData] = useState(null);
@@ -12,7 +13,7 @@ function CityProfile({ cityName, onBack, onViewJobs }) {
 
   const fetchCityProfile = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/city_profile/${encodeURIComponent(cityName)}`);
+      const response = await fetch(`${API_BASE_URL}/city_profile/${encodeURIComponent(cityName)}`);
       const data = await response.json();
       setCityData(data);
       setLoading(false);

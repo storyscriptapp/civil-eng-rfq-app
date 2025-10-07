@@ -5,6 +5,7 @@ import JobDetails from './JobDetails';
 import CitiesList from './CitiesList';
 import CityProfile from './CityProfile';
 import Login from './Login';
+import API_BASE_URL from './config';
 
 function App() {
     const [auth, setAuth] = useState(localStorage.getItem('auth') || null);
@@ -15,7 +16,7 @@ function App() {
     const [pasteUrl, setPasteUrl] = useState('');
     const [screenshot, setScreenshot] = useState(null);
     const [screenshotOrg, setScreenshotOrg] = useState('');
-    
+
     // Filter states
     const [filters, setFilters] = useState({
         workType: 'all',
@@ -33,7 +34,7 @@ function App() {
 
     // Function to fetch RFQs (can be called from multiple places)
     const fetchRfqs = () => {
-        fetch('http://localhost:8000/rfqs')
+        fetch(`${API_BASE_URL}/rfqs`)
             .then(res => res.json())
             .then(data => {
                 console.log('RFQs:', data);
@@ -49,7 +50,7 @@ function App() {
             .then(data => setCities(data))
             .catch(err => console.error('Error fetching cities:', err));
         // Fetch health data
-        fetch('http://localhost:8000/health')
+        fetch(`${API_BASE_URL}/health`)
             .then(res => res.json())
             .then(data => {
                 console.log('Health data:', data);
@@ -60,7 +61,7 @@ function App() {
 
     const addCity = () => {
         setCities([...cities, newCity]);
-        fetch('http://localhost:8000/save_cities', {
+        fetch(`${API_BASE_URL}/save_cities`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify([...cities, newCity])
@@ -71,7 +72,7 @@ function App() {
     };
 
     const runScraper = () => {
-        fetch('http://localhost:8000/run_scraper', { 
+        fetch(`${API_BASE_URL}/run_scraper`, { 
             method: 'POST',
             headers: {
                 'Authorization': `Basic ${auth}`
@@ -93,7 +94,7 @@ function App() {
             return;
         }
         
-        fetch('http://localhost:8000/parse_text', {
+        fetch(`${API_BASE_URL}/parse_text`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -126,7 +127,7 @@ function App() {
         const formData = new FormData();
         formData.append('file', screenshot);
         formData.append('organization', screenshotOrg);
-        fetch('http://localhost:8000/upload_screenshot', {
+        fetch(`${API_BASE_URL}/upload_screenshot`, {
             method: 'POST',
             body: formData
         })
@@ -139,7 +140,7 @@ function App() {
     };
 
     const updateUserStatus = (jobId, status, notes = null) => {
-        fetch('http://localhost:8000/update_job_status', {
+        fetch(`${API_BASE_URL}/update_job_status`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -159,7 +160,7 @@ function App() {
     };
 
     const updateWorkType = (jobId, workType) => {
-        fetch('http://localhost:8000/update_work_type', {
+        fetch(`${API_BASE_URL}/update_work_type`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -227,7 +228,7 @@ function App() {
         return <JobDetails jobId={selectedJobId} auth={auth} onBack={() => {
             setSelectedJobId(null);
             // Refresh RFQs list when returning
-            fetch('http://localhost:8000/rfqs')
+            fetch(`${API_BASE_URL}/rfqs`)
                 .then(res => res.json())
                 .then(data => setRfqs(data))
                 .catch(err => console.error('Error fetching RFQs:', err));

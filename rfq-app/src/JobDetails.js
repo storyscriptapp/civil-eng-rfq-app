@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import API_BASE_URL from './config';
 
 function JobDetails({ jobId, auth, onBack }) {
     const [job, setJob] = useState(null);
@@ -32,7 +33,7 @@ function JobDetails({ jobId, auth, onBack }) {
     };
 
     const updateTitle = () => {
-        fetch('http://localhost:8000/update_job_details', {
+        fetch(`${API_BASE_URL}/update_job_details`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -55,7 +56,7 @@ function JobDetails({ jobId, auth, onBack }) {
         // Save user name to localStorage
         localStorage.setItem('rfq_user_name', userName);
 
-        fetch('http://localhost:8000/add_journal_entry', {
+        fetch(`${API_BASE_URL}/add_journal_entry`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

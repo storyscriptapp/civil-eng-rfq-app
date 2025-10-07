@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './CitiesList.css';
+import API_BASE_URL from './config';
 
 function CitiesList({ auth, onCitySelect, onBack }) {
   const [cities, setCities] = useState([]);
@@ -13,7 +14,7 @@ function CitiesList({ auth, onCitySelect, onBack }) {
 
   const fetchCities = async () => {
     try {
-      const response = await fetch('http://localhost:8000/cities');
+      const response = await fetch(`${API_BASE_URL}/cities`);
       const data = await response.json();
       setCities(data);
       setLoading(false);
@@ -73,7 +74,7 @@ function CitiesList({ auth, onCitySelect, onBack }) {
     if (!confirmed) return;
 
     try {
-      const response = await fetch('http://localhost:8000/run_scraper', {
+      const response = await fetch(`${API_BASE_URL}/run_scraper`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
