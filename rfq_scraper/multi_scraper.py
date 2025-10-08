@@ -88,9 +88,8 @@ def create_driver():
         driver_options.add_argument("--disable-blink-features=AutomationControlled")
         driver_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         driver_options.add_experimental_option('useAutomationExtension', False)
-        driver_options.headless = True  # Run in headless mode to avoid GUI conflicts
+        driver_options.headless = False  # Show browser windows (easier for dev/debugging)
         driver_options.add_argument("--window-size=1920,1080")
-        driver_options.add_argument("--headless=new")  # Use new headless mode
         driver_options.add_argument("--disable-gpu")
         driver_options.add_argument("--disable-software-rasterizer")
         
