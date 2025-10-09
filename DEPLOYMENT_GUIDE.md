@@ -62,6 +62,7 @@ python -m venv venv
 
 # Activate virtual environment
 .\venv\Scripts\Activate.ps1
+OR venv\Scripts\activate
 
 # Install Python packages
 pip install fastapi uvicorn selenium pillow pytesseract opencv-python undetected-chromedriver setuptools
@@ -69,6 +70,7 @@ pip install fastapi uvicorn selenium pillow pytesseract opencv-python undetected
 # Install Tesseract OCR
 # Download from: https://github.com/UB-Mannheim/tesseract/wiki
 # Install to: C:\Program Files\Tesseract-OCR\
+# tesseract v5.5.0.20241111
 ```
 
 ---
@@ -102,7 +104,14 @@ RFQ_PASSWORD_HASH="8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6
    - Name: `RFQ_USERNAME`, Value: `admin` (or your preferred username)
    - Name: `RFQ_PASSWORD_HASH`, Value: `[paste the hash from above]`
 5. Click OK
-
+6. To verify your environment variables are set correctly:
+After setting them and clicking OK, open a NEW PowerShell window and run:
+ # $env:RFQ_API_USERNAME
+ $env:RFQ_API_PASSWORD_HASH
+Expected output:
+admin
+494a715f7e9b4071aca61bac42ca858a309524e5864f0920030862a4ae7589be
+If you see quotes in the output, you'll need to remove them from the environment variables and try again.
 ---
 
 ### Step 1.5: Build React App for Production

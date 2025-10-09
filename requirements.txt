@@ -12,6 +12,7 @@ opencv-python
 # Backend API
 fastapi
 uvicorn[standard]
+python-multipart
 
 # Frontend (handled by npm/package.json in rfq-app/)
 # - react

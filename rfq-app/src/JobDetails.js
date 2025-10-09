@@ -17,7 +17,7 @@ function JobDetails({ jobId, auth, onBack }) {
     }, [jobId]);
 
     const loadJobDetails = () => {
-        fetch(`http://localhost:8000/job_details/${jobId}`)
+        fetch(`${API_BASE_URL}/job_details/${jobId}`)
             .then(res => res.json())
             .then(data => {
                 setJob(data.job);
