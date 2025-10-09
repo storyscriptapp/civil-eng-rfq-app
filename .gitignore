@@ -29,6 +29,7 @@ build/
 rfq_scraper/rfqs.json
 rfq_scraper/scraper_health.json
 rfq_scraper/scraper_checkpoint.json
+rfq_scraper/scraper_history.json
 
 # Node
 node_modules/
