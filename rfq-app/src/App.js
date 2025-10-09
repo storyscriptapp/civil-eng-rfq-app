@@ -187,7 +187,7 @@ function App() {
             const file = e.target.files[0];
             if (!file) return;
 
-            if (!window.confirm(`Upload database file "${file.name}" to server? This will replace the current database (backup will be created).`)) {
+            if (!window.confirm(`Upload database file "${file.name}" to server?\n\nThis will:\n• Add NEW jobs from your dev database\n• Update job metadata (title, link, due date)\n• PRESERVE all your notes and status changes\n• Create a backup before syncing\n\nContinue?`)) {
                 return;
             }
 

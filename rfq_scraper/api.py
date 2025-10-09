@@ -690,56 +690,151 @@ async def sync_database(
     username: str = Depends(get_current_username)
 ):
     """
-    Upload and replace the database file from dev environment to production.
-    Creates a backup of the existing database before replacing.
+    Smart merge: Upload database from dev environment to production.
+    - Adds NEW jobs from dev database
+    - Updates metadata for existing jobs (title, link, due_date, etc.)
+    - PRESERVES all user data (status, notes, journal entries)
+    - Creates a backup before making any changes
     """
+    temp_db_path = None
+    backup_path = None
+    
     try:
-        db_path = os.path.join(os.path.dirname(__file__), "rfq_tracking.db")
+        prod_db_path = os.path.join(os.path.dirname(__file__), "rfq_tracking.db")
         
         # Verify uploaded file is a SQLite database
         contents = await file.read()
         if not contents.startswith(b'SQLite format 3'):
             return {"success": False, "error": "Invalid file: Not a SQLite database"}
         
-        # Create backup of existing database
-        if os.path.exists(db_path):
+        # Save uploaded database to temp file
+        temp_db_path = os.path.join(os.path.dirname(__file__), f"temp_upload_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db")
+        with open(temp_db_path, 'wb') as f:
+            f.write(contents)
+        
+        # Create backup of production database
+        if os.path.exists(prod_db_path):
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             backup_path = os.path.join(
                 os.path.dirname(__file__), 
                 f"rfq_tracking_backup_{timestamp}.db"
             )
-            shutil.copy2(db_path, backup_path)
+            shutil.copy2(prod_db_path, backup_path)
             print(f"✅ Backup created: {backup_path}")
         
-        # Write new database
-        with open(db_path, 'wb') as f:
-            f.write(contents)
+        # Connect to both databases
+        temp_conn = sqlite3.connect(temp_db_path)
+        temp_conn.row_factory = sqlite3.Row
+        temp_cursor = temp_conn.cursor()
         
-        # Verify the new database is valid
-        try:
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM jobs")
-            job_count = cursor.fetchone()[0]
-            conn.close()
+        prod_conn = sqlite3.connect(prod_db_path)
+        prod_cursor = prod_conn.cursor()
+        
+        # Get all jobs from uploaded database
+        temp_cursor.execute("""
+            SELECT job_id, organization, rfp_number, title, link, due_date, 
+                   first_seen, last_seen, job_info, added_by
+            FROM jobs
+        """)
+        uploaded_jobs = temp_cursor.fetchall()
+        
+        jobs_added = 0
+        jobs_updated = 0
+        
+        # Process each job from uploaded database
+        for job in uploaded_jobs:
+            # Check if job exists in production
+            prod_cursor.execute("SELECT job_id, user_status, work_type FROM jobs WHERE job_id = ?", (job['job_id'],))
+            existing_job = prod_cursor.fetchone()
             
-            return {
-                "success": True,
-                "message": f"Database synced successfully! {job_count} jobs in database.",
-                "job_count": job_count,
-                "synced_at": datetime.now().isoformat()
-            }
-        except Exception as verify_error:
-            # Restore backup if verification fails
-            if os.path.exists(backup_path):
-                shutil.copy2(backup_path, db_path)
-            return {
-                "success": False,
-                "error": f"Database verification failed: {verify_error}. Backup restored."
-            }
+            if existing_job is None:
+                # NEW JOB - Insert it completely
+                prod_cursor.execute("""
+                    INSERT INTO jobs (
+                        job_id, organization, rfp_number, title, link, due_date,
+                        first_seen, last_seen, user_status, work_type, job_info, added_by
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'new', 'Unknown', ?, ?)
+                """, (
+                    job['job_id'], job['organization'], job['rfp_number'], 
+                    job['title'], job['link'], job['due_date'],
+                    job['first_seen'], job['last_seen'], job['job_info'], job['added_by']
+                ))
+                jobs_added += 1
+            else:
+                # EXISTING JOB - Update only metadata, preserve user data
+                prod_cursor.execute("""
+                    UPDATE jobs SET
+                        organization = ?,
+                        rfp_number = ?,
+                        title = ?,
+                        link = ?,
+                        due_date = ?,
+                        last_seen = ?,
+                        job_info = ?,
+                        added_by = ?
+                    WHERE job_id = ?
+                """, (
+                    job['organization'], job['rfp_number'], job['title'],
+                    job['link'], job['due_date'], job['last_seen'],
+                    job['job_info'], job['added_by'], job['job_id']
+                ))
+                jobs_updated += 1
+        
+        # Sync scraper history from uploaded database
+        temp_cursor.execute("SELECT * FROM job_scrape_history")
+        history_entries = temp_cursor.fetchall()
+        
+        for entry in history_entries:
+            # Insert if doesn't exist (based on job_id + scraped_at)
+            prod_cursor.execute("""
+                INSERT OR IGNORE INTO job_scrape_history (job_id, scraped_at, rfp_number, title, link, due_date)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                entry['job_id'], entry['scraped_at'], entry['rfp_number'],
+                entry['title'], entry['link'], entry['due_date']
+            ))
+        
+        # Commit changes
+        prod_conn.commit()
+        
+        # Get final counts
+        prod_cursor.execute("SELECT COUNT(*) FROM jobs")
+        total_jobs = prod_cursor.fetchone()[0]
+        
+        # Close connections
+        temp_conn.close()
+        prod_conn.close()
+        
+        # Clean up temp file
+        if os.path.exists(temp_db_path):
+            os.remove(temp_db_path)
+        
+        return {
+            "success": True,
+            "message": f"Smart sync completed! {jobs_added} new jobs added, {jobs_updated} jobs updated.",
+            "jobs_added": jobs_added,
+            "jobs_updated": jobs_updated,
+            "total_jobs": total_jobs,
+            "synced_at": datetime.now().isoformat()
+        }
             
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        # Restore backup if something went wrong
+        if backup_path and os.path.exists(backup_path) and os.path.exists(prod_db_path):
+            shutil.copy2(backup_path, prod_db_path)
+            error_msg = f"Sync failed: {str(e)}. Backup restored."
+        else:
+            error_msg = f"Sync failed: {str(e)}"
+        
+        return {"success": False, "error": error_msg}
+    
+    finally:
+        # Clean up temp file if it still exists
+        if temp_db_path and os.path.exists(temp_db_path):
+            try:
+                os.remove(temp_db_path)
+            except:
+                pass
 
 # Catch-all route to serve React app for any non-API routes
 @app.get("/{path:path}")
