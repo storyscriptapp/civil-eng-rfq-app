@@ -296,9 +296,10 @@ async def get_job_details(job_id: str):
 
 @app.post("/update_job_details")
 async def update_job_details(data: dict, username: str = Depends(get_current_username)):
-    """Update job title and other editable fields"""
+    """Update job title, due date, and other editable fields"""
     job_id = data.get("job_id")
     title = data.get("title")
+    due_date = data.get("due_date")
     
     if not job_id:
         return {"error": "Missing job_id"}
@@ -308,10 +309,23 @@ async def update_job_details(data: dict, username: str = Depends(get_current_use
     conn = tracker.conn
     cursor = conn.cursor()
     
+    updates = []
+    params = []
+    
     if title:
-        cursor.execute("""
-            UPDATE jobs SET title = ?, title_manually_edited = 1 WHERE job_id = ?
-        """, (title, job_id))
+        updates.append("title = ?")
+        params.append(title)
+        updates.append("title_manually_edited = 1")
+    
+    if due_date:
+        updates.append("due_date = ?")
+        params.append(due_date)
+        updates.append("due_date_manually_edited = 1")
+    
+    if updates:
+        params.append(job_id)
+        query = f"UPDATE jobs SET {', '.join(updates)} WHERE job_id = ?"
+        cursor.execute(query, params)
         conn.commit()
     
     # Also update in rfqs.json
@@ -324,6 +338,8 @@ async def update_job_details(data: dict, username: str = Depends(get_current_use
             if rfq.get('job_id') == job_id:
                 if title:
                     rfq['title'] = title
+                if due_date:
+                    rfq['due_date'] = due_date
                 break
         
         with open(rfqs_path, 'w') as f:
@@ -744,7 +760,8 @@ async def sync_database(
         for job in uploaded_jobs:
             # Check if job exists in production
             prod_cursor.execute("""
-                SELECT job_id, user_status, work_type, title_manually_edited, title 
+                SELECT job_id, user_status, work_type, title_manually_edited, title,
+                       due_date_manually_edited, due_date
                 FROM jobs WHERE job_id = ?
             """, (job['job_id'],))
             existing_job = prod_cursor.fetchone()
@@ -766,11 +783,35 @@ async def sync_database(
                 # EXISTING JOB - Update only metadata, preserve user data
                 title_manually_edited = existing_job[3] if len(existing_job) > 3 else 0
                 current_title = existing_job[4] if len(existing_job) > 4 else None
+                due_date_manually_edited = existing_job[5] if len(existing_job) > 5 else 0
+                current_due_date = existing_job[6] if len(existing_job) > 6 else None
                 
-                # Check for title conflict
+                # Determine which fields to update
+                update_title = not (title_manually_edited and current_title != job['title'])
+                update_due_date = not (due_date_manually_edited and current_due_date != job['due_date'])
+                
                 if title_manually_edited and current_title != job['title']:
                     title_conflicts += 1
-                    # Preserve manually edited title
+                
+                # Build dynamic update query based on what should be preserved
+                if not update_title and not update_due_date:
+                    # Preserve both title and due_date
+                    prod_cursor.execute("""
+                        UPDATE jobs SET
+                            organization = ?,
+                            rfp_number = ?,
+                            link = ?,
+                            last_seen = ?,
+                            job_info = ?,
+                            added_by = ?
+                        WHERE job_id = ?
+                    """, (
+                        job['organization'], job['rfp_number'],
+                        job['link'], job['last_seen'],
+                        job['job_info'], job['added_by'], job['job_id']
+                    ))
+                elif not update_title:
+                    # Preserve title, update due_date
                     prod_cursor.execute("""
                         UPDATE jobs SET
                             organization = ?,
@@ -786,8 +827,25 @@ async def sync_database(
                         job['link'], job['due_date'], job['last_seen'],
                         job['job_info'], job['added_by'], job['job_id']
                     ))
+                elif not update_due_date:
+                    # Preserve due_date, update title
+                    prod_cursor.execute("""
+                        UPDATE jobs SET
+                            organization = ?,
+                            rfp_number = ?,
+                            title = ?,
+                            link = ?,
+                            last_seen = ?,
+                            job_info = ?,
+                            added_by = ?
+                        WHERE job_id = ?
+                    """, (
+                        job['organization'], job['rfp_number'], job['title'],
+                        job['link'], job['last_seen'],
+                        job['job_info'], job['added_by'], job['job_id']
+                    ))
                 else:
-                    # Update including title
+                    # Update everything
                     prod_cursor.execute("""
                         UPDATE jobs SET
                             organization = ?,

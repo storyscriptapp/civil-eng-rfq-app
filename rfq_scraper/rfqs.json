@@ -713,7 +713,7 @@
         "link": "https://www.publicpurchase.com/gems/apachejunction,az/bid/bidView?bidId=204738",
         "documents": [],
         "job_id": "RFQ-145931865895",
-        "user_status": "new",
+        "user_status": "pursuing",
         "user_notes": null,
         "first_seen": "2025-10-07"
     },
@@ -840,7 +840,7 @@
     {
         "organization": "Maricopa County",
         "rfp_number": "250123-RFP",
-        "title": "Law Enforcement Background Software",
+        "title": "Law Enforcement Background Software test title",
         "work_type": "unknown",
         "open_date": "2025-10-07",
         "due_date": "10/14/2025",
@@ -923,7 +923,7 @@
         "link": "https://www.bidnetdirect.com/arizona/solicitations/open-bids/Pipeline-Video-Inspection-Condition-Assessment-for-Dams-and-Levees/0000398955?purchasingGroupId=700132901&origin=2",
         "documents": [],
         "job_id": "RFQ-58c9117a2a8c",
-        "user_status": "new",
+        "user_status": "ignore",
         "user_notes": null,
         "first_seen": "2025-10-07"
     },

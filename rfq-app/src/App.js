@@ -253,7 +253,13 @@ function App() {
                 const parseDateSafely = (dateStr) => {
                     if (!dateStr || dateStr === 'N/A') return null;
                     try {
-                        const date = new Date(dateStr);
+                        // Clean up the date string for better parsing
+                        let cleanedDate = dateStr
+                            .replace(/(\d+)(st|nd|rd|th)/g, '$1') // Remove ordinal suffixes (13th -> 13)
+                            .replace(/\s+MST|\s+PST|\s+EST|\s+CST/gi, '') // Remove timezone abbreviations
+                            .trim();
+                        
+                        const date = new Date(cleanedDate);
                         // Check if date is valid
                         if (isNaN(date.getTime())) return null;
                         return date;
