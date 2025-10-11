@@ -249,10 +249,39 @@ function App() {
         // Apply sorting
         switch (filters.sortBy) {
             case 'due_date':
-                // Parse dates for comparison (handle "N/A")
-                const dateA = a.due_date && a.due_date !== 'N/A' ? new Date(a.due_date) : new Date('9999-12-31');
-                const dateB = b.due_date && b.due_date !== 'N/A' ? new Date(b.due_date) : new Date('9999-12-31');
+                // Parse dates for comparison
+                const parseDateSafely = (dateStr) => {
+                    if (!dateStr || dateStr === 'N/A') return null;
+                    try {
+                        const date = new Date(dateStr);
+                        // Check if date is valid
+                        if (isNaN(date.getTime())) return null;
+                        return date;
+                    } catch {
+                        return null;
+                    }
+                };
+                
+                const dateA = parseDateSafely(a.due_date);
+                const dateB = parseDateSafely(b.due_date);
+                const now = new Date();
+                
+                // If both invalid, maintain order
+                if (!dateA && !dateB) return 0;
+                // Invalid dates go to end
+                if (!dateA) return 1;
+                if (!dateB) return -1;
+                
+                // Past dates go to end
+                const isPastA = dateA < now;
+                const isPastB = dateB < now;
+                
+                if (isPastA && !isPastB) return 1;  // A past, B future -> B first
+                if (!isPastA && isPastB) return -1; // A future, B past -> A first
+                
+                // Both past or both future, sort normally
                 return dateA - dateB;
+                
             case 'work_type':
                 return (a.work_type || '').localeCompare(b.work_type || '');
             case 'organization':
@@ -553,20 +582,22 @@ function App() {
                                             <td>
                                                 <select 
                                                     className="form-select form-select-sm"
-                                                    value={rfq.work_type || 'unknown'}
+                                                    value={rfq.work_type || 'Unknown'}
                                                     onChange={(e) => updateWorkType(rfq.job_id, e.target.value)}
                                                     style={{minWidth: '150px'}}
                                                 >
-                                                    <option value="civil">Civil Engineering</option>
-                                                    <option value="utility/transportation">Utility/Transportation</option>
-                                                    <option value="maintenance">Maintenance</option>
-                                                    <option value="architecture">Architecture</option>
-                                                    <option value="mechanical">Mechanical</option>
-                                                    <option value="electrical">Electrical</option>
-                                                    <option value="environmental">Environmental</option>
-                                                    <option value="it">IT/Technology</option>
-                                                    <option value="other">Other</option>
-                                                    <option value="unknown">Unknown</option>
+                                                    <option value="Civil">Civil</option>
+                                                    <option value="Construction">Construction</option>
+                                                    <option value="CMAR">CMAR</option>
+                                                    <option value="Utility/Transportation">Utility/Transportation</option>
+                                                    <option value="Maintenance">Maintenance</option>
+                                                    <option value="Architecture">Architecture</option>
+                                                    <option value="Mechanical">Mechanical</option>
+                                                    <option value="Electrical">Electrical</option>
+                                                    <option value="Environmental">Environmental</option>
+                                                    <option value="IT/Technology">IT/Technology</option>
+                                                    <option value="Other">Other</option>
+                                                    <option value="Unknown">Unknown</option>
                                                 </select>
                                             </td>
                             <td>{rfq.due_date}</td>
