@@ -23,7 +23,8 @@ function App() {
         userStatus: 'all',
         organization: 'all',
         searchTerm: '',
-        hideIgnored: true  // Hide ignored by default
+        hideIgnored: true,  // Hide ignored by default
+        sortBy: 'due_date'  // Default sort by due date
     });
     
     // Selected job for detail view
@@ -244,6 +245,26 @@ function App() {
         }
         
         return true;
+    }).sort((a, b) => {
+        // Apply sorting
+        switch (filters.sortBy) {
+            case 'due_date':
+                // Parse dates for comparison (handle "N/A")
+                const dateA = a.due_date && a.due_date !== 'N/A' ? new Date(a.due_date) : new Date('9999-12-31');
+                const dateB = b.due_date && b.due_date !== 'N/A' ? new Date(b.due_date) : new Date('9999-12-31');
+                return dateA - dateB;
+            case 'work_type':
+                return (a.work_type || '').localeCompare(b.work_type || '');
+            case 'organization':
+                return (a.organization || '').localeCompare(b.organization || '');
+            case 'date_added':
+                // Sort by first_seen (most recent first)
+                const addedA = a.first_seen ? new Date(a.first_seen) : new Date(0);
+                const addedB = b.first_seen ? new Date(b.first_seen) : new Date(0);
+                return addedB - addedA;
+            default:
+                return 0;
+        }
     });
 
     // Get unique organizations for filter dropdown
@@ -386,16 +407,18 @@ function App() {
                                 onChange={e => setFilters({...filters, workType: e.target.value})}
                             >
                                 <option value="all">All Types</option>
-                                <option value="civil">Civil Engineering</option>
-                                <option value="utility/transportation">Utility/Transportation</option>
-                                <option value="maintenance">Maintenance</option>
-                                <option value="architecture">Architecture</option>
-                                <option value="mechanical">Mechanical</option>
-                                <option value="electrical">Electrical</option>
-                                <option value="environmental">Environmental</option>
-                                <option value="it">IT/Technology</option>
-                                <option value="other">Other</option>
-                                <option value="unknown">Unknown</option>
+                                <option value="Civil">Civil</option>
+                                <option value="Construction">Construction</option>
+                                <option value="CMAR">CMAR</option>
+                                <option value="Utility/Transportation">Utility/Transportation</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Architecture">Architecture</option>
+                                <option value="Mechanical">Mechanical</option>
+                                <option value="Electrical">Electrical</option>
+                                <option value="Environmental">Environmental</option>
+                                <option value="IT/Technology">IT/Technology</option>
+                                <option value="Other">Other</option>
+                                <option value="Unknown">Unknown</option>
                             </select>
                         </div>
                         <div className="col-md-2">
@@ -439,6 +462,21 @@ function App() {
                                     Hide Ignored
                                 </label>
                             </div>
+                        </div>
+                    </div>
+                    <div className="row g-3 mt-2">
+                        <div className="col-md-3">
+                            <label className="form-label">Sort By</label>
+                            <select 
+                                className="form-select"
+                                value={filters.sortBy}
+                                onChange={e => setFilters({...filters, sortBy: e.target.value})}
+                            >
+                                <option value="due_date">Due Date (Soonest First)</option>
+                                <option value="date_added">Date Added (Newest First)</option>
+                                <option value="organization">Organization (A-Z)</option>
+                                <option value="work_type">Work Type (A-Z)</option>
+                            </select>
                         </div>
                     </div>
                     <div className="mt-2">

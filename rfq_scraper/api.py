@@ -193,24 +193,22 @@ async def update_work_type(data: dict, username: str = Depends(get_current_usern
     if not job_id or not work_type:
         return {"error": "Missing job_id or work_type"}
     
-    # Update in rfqs.json
-    rfqs_path = os.path.join(os.path.dirname(__file__), "rfqs.json")
+    # Update in database
+    tracker = RFQJobTracker()
+    conn = sqlite3.connect(tracker.db_path)
+    cursor = conn.cursor()
+    
     try:
-        with open(rfqs_path, 'r') as f:
-            rfqs = json.load(f)
+        cursor.execute("""
+            UPDATE jobs SET work_type = ? WHERE job_id = ?
+        """, (work_type, job_id))
         
-        # Update the specific job
-        for rfq in rfqs:
-            if rfq.get('job_id') == job_id:
-                rfq['work_type'] = work_type
-                break
-        
-        # Save back to file
-        with open(rfqs_path, 'w') as f:
-            json.dump(rfqs, f, indent=4)
+        conn.commit()
+        conn.close()
         
         return {"status": "Work type updated", "job_id": job_id, "work_type": work_type}
     except Exception as e:
+        conn.close()
         return {"error": str(e)}
 
 @app.get("/job_details/{job_id}")
@@ -312,7 +310,7 @@ async def update_job_details(data: dict, username: str = Depends(get_current_use
     
     if title:
         cursor.execute("""
-            UPDATE jobs SET title = ? WHERE job_id = ?
+            UPDATE jobs SET title = ?, title_manually_edited = 1 WHERE job_id = ?
         """, (title, job_id))
         conn.commit()
     
@@ -740,11 +738,15 @@ async def sync_database(
         
         jobs_added = 0
         jobs_updated = 0
+        title_conflicts = 0
         
         # Process each job from uploaded database
         for job in uploaded_jobs:
             # Check if job exists in production
-            prod_cursor.execute("SELECT job_id, user_status, work_type FROM jobs WHERE job_id = ?", (job['job_id'],))
+            prod_cursor.execute("""
+                SELECT job_id, user_status, work_type, title_manually_edited, title 
+                FROM jobs WHERE job_id = ?
+            """, (job['job_id'],))
             existing_job = prod_cursor.fetchone()
             
             if existing_job is None:
@@ -762,22 +764,46 @@ async def sync_database(
                 jobs_added += 1
             else:
                 # EXISTING JOB - Update only metadata, preserve user data
-                prod_cursor.execute("""
-                    UPDATE jobs SET
-                        organization = ?,
-                        rfp_number = ?,
-                        title = ?,
-                        link = ?,
-                        due_date = ?,
-                        last_seen = ?,
-                        job_info = ?,
-                        added_by = ?
-                    WHERE job_id = ?
-                """, (
-                    job['organization'], job['rfp_number'], job['title'],
-                    job['link'], job['due_date'], job['last_seen'],
-                    job['job_info'], job['added_by'], job['job_id']
-                ))
+                title_manually_edited = existing_job[3] if len(existing_job) > 3 else 0
+                current_title = existing_job[4] if len(existing_job) > 4 else None
+                
+                # Check for title conflict
+                if title_manually_edited and current_title != job['title']:
+                    title_conflicts += 1
+                    # Preserve manually edited title
+                    prod_cursor.execute("""
+                        UPDATE jobs SET
+                            organization = ?,
+                            rfp_number = ?,
+                            link = ?,
+                            due_date = ?,
+                            last_seen = ?,
+                            job_info = ?,
+                            added_by = ?
+                        WHERE job_id = ?
+                    """, (
+                        job['organization'], job['rfp_number'],
+                        job['link'], job['due_date'], job['last_seen'],
+                        job['job_info'], job['added_by'], job['job_id']
+                    ))
+                else:
+                    # Update including title
+                    prod_cursor.execute("""
+                        UPDATE jobs SET
+                            organization = ?,
+                            rfp_number = ?,
+                            title = ?,
+                            link = ?,
+                            due_date = ?,
+                            last_seen = ?,
+                            job_info = ?,
+                            added_by = ?
+                        WHERE job_id = ?
+                    """, (
+                        job['organization'], job['rfp_number'], job['title'],
+                        job['link'], job['due_date'], job['last_seen'],
+                        job['job_info'], job['added_by'], job['job_id']
+                    ))
                 jobs_updated += 1
         
         # Sync scraper history from uploaded database
@@ -809,11 +835,17 @@ async def sync_database(
         if os.path.exists(temp_db_path):
             os.remove(temp_db_path)
         
+        # Build message
+        message = f"Smart sync completed! {jobs_added} new jobs added, {jobs_updated} jobs updated."
+        if title_conflicts > 0:
+            message += f" {title_conflicts} job(s) kept your custom title (website title was different)."
+        
         return {
             "success": True,
-            "message": f"Smart sync completed! {jobs_added} new jobs added, {jobs_updated} jobs updated.",
+            "message": message,
             "jobs_added": jobs_added,
             "jobs_updated": jobs_updated,
+            "title_conflicts": title_conflicts,
             "total_jobs": total_jobs,
             "synced_at": datetime.now().isoformat()
         }

@@ -3,3 +3,16 @@ start venv: in powershell run cd .\rfq_scraper AND .\venv\Scripts\Activate.ps1
 start webpage: uvicorn api:app --reload --port 8000 in rfq_scraper AND npm start in rfq-app
 
 start multi-scraper: python multi_scraper.py ; ctrl-c to stop python multi_scraper.py --resume to start again where it left off
+
+
+pull from git on jellyfin server: 
+cd.. rfq-tracker
+git pull origin main
+cd rfq-app
+npm run build
+
+cd C:\rfq-tracker
+   git pull origin main
+   cd rfq-app
+   npm run build
+   # Restart uvicorn (Ctrl+C, then run start_rfq_api.bat)
