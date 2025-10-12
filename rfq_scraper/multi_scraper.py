@@ -31,12 +31,15 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 
 # Load cities
 with open("cities.json", "r") as f:
-    sites = json.load(f)
+    all_sites = json.load(f)
+
+# Keep reference to all cities for end-of-scrape reminders
+sites = all_sites.copy()
 
 # Filter cities if --cities argument provided
 if args.cities:
     selected_city_names = [name.strip() for name in args.cities.split(',')]
-    sites = [city for city in sites if city['organization'] in selected_city_names]
+    sites = [city for city in all_sites if city['organization'] in selected_city_names]
     print(f"\n{'='*60}")
     print(f"Scraping SELECTED cities: {len(sites)}")
     print(f"Cities: {', '.join([c['organization'] for c in sites])}")
@@ -669,21 +672,21 @@ print(f"   Completed: {tracking_stats['by_status'].get('completed', 0)}")
 if cities_config_updated:
     print("\n📝 Updating cities.json with new working strategies...")
     with open("cities.json", "w") as f:
-        json.dump(sites, f, indent=4)
+        json.dump(all_sites, f, indent=4)
     print("✅ cities.json updated")
 
 # Save health monitoring data
 health_monitor.save_run()
 
-# Show manual cities reminder
-manual_cities = [site['organization'] for site in sites if site.get('manual', False)]
+# Show manual cities reminder (check ALL cities, not just scraped ones)
+manual_cities = [site['organization'] for site in all_sites if site.get('manual', False)]
 if manual_cities:
     print("\n" + "="*60)
     print("⚠️  MANUAL ENTRY REMINDER")
     print("="*60)
     print(f"\n🔍 Please check these cities manually and add jobs via the parsing tool:\n")
     for city in manual_cities:
-        city_info = next((s for s in sites if s['organization'] == city), None)
+        city_info = next((s for s in all_sites if s['organization'] == city), None)
         if city_info:
             print(f"   • {city}")
             print(f"     URL: {city_info['url']}")
