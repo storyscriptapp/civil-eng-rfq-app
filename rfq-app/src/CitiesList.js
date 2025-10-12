@@ -67,9 +67,21 @@ function CitiesList({ auth, onCitySelect, onBack }) {
     }
 
     const citiesList = [...selectedCities];
-    const confirmed = window.confirm(
-      `Start scraping ${citiesList.length} cities?\n\n${citiesList.join('\n')}\n\nA new terminal window will open showing progress.`
-    );
+    
+    // Check for manual-only cities
+    const manualCities = cities.filter(c => 
+      citiesList.includes(c.name) && (c.manual || !c.is_active)
+    ).map(c => c.name);
+    
+    let confirmMessage = `Start scraping ${citiesList.length} cities?\n\n${citiesList.join('\n')}`;
+    
+    if (manualCities.length > 0) {
+      confirmMessage += `\n\n⚠️ MANUAL ENTRY REQUIRED:\nThese cities will be SKIPPED and require manual checking:\n${manualCities.join('\n')}`;
+    }
+    
+    confirmMessage += `\n\nA new terminal window will open showing progress.`;
+    
+    const confirmed = window.confirm(confirmMessage);
 
     if (!confirmed) return;
 
@@ -156,6 +168,22 @@ function CitiesList({ auth, onCitySelect, onBack }) {
                     className="city-name-link"
                   >
                     {city.name}
+                    {(city.manual || !city.is_active) && (
+                      <span 
+                        style={{ 
+                          marginLeft: '8px', 
+                          fontSize: '0.85em',
+                          color: '#856404',
+                          backgroundColor: '#fff3cd',
+                          padding: '2px 6px',
+                          borderRadius: '3px',
+                          fontWeight: 'normal'
+                        }}
+                        title="This city requires manual job entry"
+                      >
+                        ⚠️ Manual
+                      </span>
+                    )}
                   </button>
                 </td>
                 <td className="data-placeholder">

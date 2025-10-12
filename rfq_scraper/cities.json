@@ -243,5 +243,14 @@
         "manual": false,
         "uses_iframe": false,
         "note": "CivicPlus Bids.aspx page - div-based layout, NO iframe"
+    },
+    {
+        "organization": "State of Arizona",
+        "url": "https://app.az.gov/",
+        "row_selector": "",
+        "cell_count": 0,
+        "is_dynamic": false,
+        "manual": true,
+        "note": "MANUAL ENTRY ONLY - Arizona Procurement Portal has too much data and requires login. Check manually and use parsing tool to add jobs."
     }
 ]

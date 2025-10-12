@@ -146,10 +146,12 @@ for site_idx, site in enumerate(sites):
         print(f"⏭️  Skipping {org} (already completed in this run)")
         continue
 
+    # Skip manual-only cities (requires manual job entry)
     if manual:
-        print(f"Scraping {org} (manual CAPTCHA required)...")
-        input(f"Press Enter after resolving CAPTCHA for {org} or skip...")
-        time.sleep(2)
+        print(f"⏭️  Skipping {org} (MANUAL ENTRY ONLY - check website manually and use parsing tool)")
+        health_monitor.record_city_result(org, 0, "skipped_manual")
+        checkpoint.mark_completed(site_idx, org)
+        continue
 
     try:
         # Create fresh driver for each city to avoid conflicts
@@ -672,6 +674,24 @@ if cities_config_updated:
 
 # Save health monitoring data
 health_monitor.save_run()
+
+# Show manual cities reminder
+manual_cities = [site['organization'] for site in sites if site.get('manual', False)]
+if manual_cities:
+    print("\n" + "="*60)
+    print("⚠️  MANUAL ENTRY REMINDER")
+    print("="*60)
+    print(f"\n🔍 Please check these cities manually and add jobs via the parsing tool:\n")
+    for city in manual_cities:
+        city_info = next((s for s in sites if s['organization'] == city), None)
+        if city_info:
+            print(f"   • {city}")
+            print(f"     URL: {city_info['url']}")
+            if city_info.get('note'):
+                print(f"     Note: {city_info['note']}")
+            print()
+    print("="*60)
+
 print("\n" + "="*60)
 print("HEALTH REPORT")
 print("="*60)
