@@ -71,6 +71,23 @@ function JobDetails({ jobId, auth, onBack }) {
             .catch(err => console.error('Error updating due date:', err));
     };
 
+    const updateStatus = (newStatus) => {
+        fetch(`${API_BASE_URL}/update_job_status`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${auth}`
+            },
+            body: JSON.stringify({ job_id: jobId, status: newStatus })
+        })
+            .then(res => res.json())
+            .then(data => {
+                setJob({ ...job, user_status: newStatus });
+                console.log('Status updated:', data);
+            })
+            .catch(err => console.error('Error updating status:', err));
+    };
+
     const addJournalEntry = () => {
         if (!newJournalEntry.trim()) return;
 
@@ -157,15 +174,22 @@ function JobDetails({ jobId, auth, onBack }) {
                             </p>
                         </div>
                         <div className="col-md-4 text-end">
-                            <p><strong>Status:</strong> 
-                                {job.user_status === 'new' && <span className="badge bg-success ms-2">NEW</span>}
-                                {job.user_status === 'pursuing' && <span className="badge bg-warning ms-2">Pursuing</span>}
-                                {job.user_status === 'watch' && <span className="badge bg-primary ms-2">Watch</span>}
-                                {job.user_status === 'completed' && <span className="badge bg-info ms-2">Completed</span>}
-                                {job.user_status === 'lost' && <span className="badge bg-dark ms-2">Lost</span>}
-                                {job.user_status === 'declined' && <span className="badge bg-secondary ms-2">Declined</span>}
-                                {job.user_status === 'ignore' && <span className="badge bg-danger ms-2">Ignored</span>}
-                            </p>
+                            <div className="mb-3">
+                                <label className="form-label"><strong>Status:</strong></label>
+                                <select 
+                                    className="form-select"
+                                    value={job.user_status}
+                                    onChange={(e) => updateStatus(e.target.value)}
+                                >
+                                    <option value="new">🟢 New</option>
+                                    <option value="pursuing">🟡 Pursuing</option>
+                                    <option value="watch">🔵 Watch</option>
+                                    <option value="completed">🔷 Completed</option>
+                                    <option value="lost">⚫ Lost</option>
+                                    <option value="declined">⚪ Declined</option>
+                                    <option value="ignore">🔴 Ignored</option>
+                                </select>
+                            </div>
                             <p><strong>Work Type:</strong> <span className="badge bg-light text-dark">{job.work_type}</span></p>
                             <p>
                                 <strong>Due Date:</strong> {editingDueDate ? (
