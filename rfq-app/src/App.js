@@ -46,9 +46,13 @@ function App() {
 
     useEffect(() => {
         fetchRfqs();
-        fetch('/rfq_scraper/cities.json')
+        // Fetch cities from API
+        fetch(`${API_BASE_URL}/cities`)
             .then(res => res.json())
-            .then(data => setCities(data))
+            .then(data => {
+                console.log('Cities loaded:', data.length);
+                setCities(data);
+            })
             .catch(err => console.error('Error fetching cities:', err));
         // Fetch health data
         fetch(`${API_BASE_URL}/health`)
@@ -342,7 +346,7 @@ function App() {
 
     // Helper function to get city procurement URL
     const getCityUrl = (organizationName) => {
-        const city = cities.find(c => c.organization === organizationName);
+        const city = cities.find(c => c.name === organizationName);
         return city ? city.url : null;
     };
 
@@ -693,6 +697,20 @@ function App() {
                                                         title="Mark as Completed"
                                                     >
                                                         ✔✔
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-outline-primary" 
+                                                        onClick={() => updateUserStatus(rfq.job_id, 'watch')}
+                                                        title="Watch (for relationship building)"
+                                                    >
+                                                        👁️
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-outline-dark" 
+                                                        onClick={() => updateUserStatus(rfq.job_id, 'lost')}
+                                                        title="Mark as Lost"
+                                                    >
+                                                        ✖
                                                     </button>
                                                     <button 
                                                         className="btn btn-outline-danger" 
