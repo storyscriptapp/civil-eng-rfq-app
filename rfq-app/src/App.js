@@ -340,6 +340,12 @@ function App() {
         }
     };
 
+    // Helper function to get city procurement URL
+    const getCityUrl = (organizationName) => {
+        const city = cities.find(c => c.organization === organizationName);
+        return city ? city.url : null;
+    };
+
     // Navigation handlers
     const handleCitySelect = (cityName) => {
         setSelectedCity(cityName);
@@ -501,7 +507,9 @@ function App() {
                                 <option value="all">All Status</option>
                                 <option value="new">New</option>
                                 <option value="pursuing">Pursuing</option>
+                                <option value="watch">Watch</option>
                                 <option value="completed">Completed</option>
+                                <option value="lost">Lost</option>
                                 <option value="declined">Declined</option>
                                 <option value="ignore">Ignored</option>
                             </select>
@@ -595,7 +603,9 @@ function App() {
                                             <td>
                                                 {rfq.user_status === 'new' && <span className="badge bg-success">NEW</span>}
                                                 {rfq.user_status === 'pursuing' && <span className="badge bg-warning">Pursuing</span>}
+                                                {rfq.user_status === 'watch' && <span className="badge bg-primary">Watch</span>}
                                                 {rfq.user_status === 'completed' && <span className="badge bg-info">Completed</span>}
+                                                {rfq.user_status === 'lost' && <span className="badge bg-dark">Lost</span>}
                                                 {rfq.user_status === 'declined' && <span className="badge bg-secondary">Declined</span>}
                                                 {rfq.user_status === 'ignore' && <span className="badge bg-danger">Ignored</span>}
                                             </td>
@@ -612,7 +622,33 @@ function App() {
                                                     {rfq.job_id ? rfq.job_id.substring(0, 8) : 'N/A'}
                                                 </a>
                                             </td>
-                                            <td><small>{rfq.organization}</small></td>
+                                            <td>
+                                                <small>
+                                                    <a 
+                                                        href="#" 
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            handleCitySelect(rfq.organization);
+                                                        }}
+                                                        className="text-decoration-none"
+                                                    >
+                                                        {rfq.organization}
+                                                    </a>
+                                                </small>
+                                                {getCityUrl(rfq.organization) && (
+                                                    <div>
+                                                        <a 
+                                                            href={getCityUrl(rfq.organization)} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer"
+                                                            className="text-decoration-none"
+                                                            style={{ fontSize: '0.75rem' }}
+                                                        >
+                                                            🔗 Procurement Page
+                                                        </a>
+                                                    </div>
+                                                )}
+                                            </td>
                                             <td>
                                                 <a href={rfq.link || '#'} target="_blank" rel="noopener noreferrer">
                                                     {rfq.title}

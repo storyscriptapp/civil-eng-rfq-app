@@ -160,7 +160,9 @@ function JobDetails({ jobId, auth, onBack }) {
                             <p><strong>Status:</strong> 
                                 {job.user_status === 'new' && <span className="badge bg-success ms-2">NEW</span>}
                                 {job.user_status === 'pursuing' && <span className="badge bg-warning ms-2">Pursuing</span>}
+                                {job.user_status === 'watch' && <span className="badge bg-primary ms-2">Watch</span>}
                                 {job.user_status === 'completed' && <span className="badge bg-info ms-2">Completed</span>}
+                                {job.user_status === 'lost' && <span className="badge bg-dark ms-2">Lost</span>}
                                 {job.user_status === 'declined' && <span className="badge bg-secondary ms-2">Declined</span>}
                                 {job.user_status === 'ignore' && <span className="badge bg-danger ms-2">Ignored</span>}
                             </p>

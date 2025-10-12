@@ -4,11 +4,13 @@ import API_BASE_URL from './config';
 
 function CityProfile({ cityName, onBack, onViewJobs }) {
   const [cityData, setCityData] = useState(null);
+  const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     fetchCityProfile();
+    fetchCityJobs();
   }, [cityName]);
 
   const fetchCityProfile = async () => {
@@ -20,6 +22,18 @@ function CityProfile({ cityName, onBack, onViewJobs }) {
     } catch (error) {
       console.error('Error fetching city profile:', error);
       setLoading(false);
+    }
+  };
+
+  const fetchCityJobs = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/rfqs`);
+      const allJobs = await response.json();
+      // Filter jobs for this city
+      const cityJobs = allJobs.filter(job => job.organization === cityName);
+      setJobs(cityJobs);
+    } catch (error) {
+      console.error('Error fetching city jobs:', error);
     }
   };
 
@@ -193,6 +207,55 @@ function CityProfile({ cityName, onBack, onViewJobs }) {
             readOnly
           />
           <p className="placeholder-note">Note editing functionality coming soon!</p>
+        </div>
+
+        {/* Active RFQs/Jobs Section */}
+        <div className="profile-card full-width">
+          <h2>Active RFQs ({jobs.length})</h2>
+          {jobs.length > 0 ? (
+            <div className="jobs-table-container" style={{ overflowX: 'auto' }}>
+              <table className="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Status</th>
+                    <th>Job ID</th>
+                    <th>RFP #</th>
+                    <th>Title</th>
+                    <th>Due Date</th>
+                    <th>Work Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {jobs.map((job) => (
+                    <tr key={job.job_id}>
+                      <td>
+                        {job.user_status === 'new' && <span className="badge bg-success">NEW</span>}
+                        {job.user_status === 'pursuing' && <span className="badge bg-warning">Pursuing</span>}
+                        {job.user_status === 'watch' && <span className="badge bg-primary">Watch</span>}
+                        {job.user_status === 'completed' && <span className="badge bg-info">Completed</span>}
+                        {job.user_status === 'lost' && <span className="badge bg-dark">Lost</span>}
+                        {job.user_status === 'declined' && <span className="badge bg-secondary">Declined</span>}
+                        {job.user_status === 'ignore' && <span className="badge bg-danger">Ignored</span>}
+                      </td>
+                      <td>
+                        <small className="font-monospace">{job.job_id ? job.job_id.substring(0, 8) : 'N/A'}</small>
+                      </td>
+                      <td><small>{job.rfp_number}</small></td>
+                      <td>
+                        <a href={job.link || '#'} target="_blank" rel="noopener noreferrer">
+                          {job.title}
+                        </a>
+                      </td>
+                      <td><small>{job.due_date}</small></td>
+                      <td><small>{job.work_type}</small></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-muted">No active RFQs for this city</p>
+          )}
         </div>
       </div>
     </div>
