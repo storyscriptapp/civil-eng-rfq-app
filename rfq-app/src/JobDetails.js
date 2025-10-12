@@ -9,6 +9,8 @@ function JobDetails({ jobId, auth, onBack }) {
     const [loading, setLoading] = useState(true);
     const [editingTitle, setEditingTitle] = useState(false);
     const [newTitle, setNewTitle] = useState('');
+    const [editingDueDate, setEditingDueDate] = useState(false);
+    const [newDueDate, setNewDueDate] = useState('');
     const [newJournalEntry, setNewJournalEntry] = useState('');
     const [userName, setUserName] = useState(localStorage.getItem('rfq_user_name') || 'User');
 
@@ -22,6 +24,7 @@ function JobDetails({ jobId, auth, onBack }) {
             .then(data => {
                 setJob(data.job);
                 setNewTitle(data.job.title);
+                setNewDueDate(data.job.due_date || '');
                 setScrapeHistory(data.scrape_history);
                 setJournalEntries(data.journal_entries);
                 setLoading(false);
@@ -48,6 +51,24 @@ function JobDetails({ jobId, auth, onBack }) {
                 console.log('Title updated:', data);
             })
             .catch(err => console.error('Error updating title:', err));
+    };
+
+    const updateDueDate = () => {
+        fetch(`${API_BASE_URL}/update_job_details`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${auth}`
+            },
+            body: JSON.stringify({ job_id: jobId, due_date: newDueDate })
+        })
+            .then(res => res.json())
+            .then(data => {
+                setJob({ ...job, due_date: newDueDate });
+                setEditingDueDate(false);
+                console.log('Due date updated:', data);
+            })
+            .catch(err => console.error('Error updating due date:', err));
     };
 
     const addJournalEntry = () => {
@@ -144,7 +165,39 @@ function JobDetails({ jobId, auth, onBack }) {
                                 {job.user_status === 'ignore' && <span className="badge bg-danger ms-2">Ignored</span>}
                             </p>
                             <p><strong>Work Type:</strong> <span className="badge bg-light text-dark">{job.work_type}</span></p>
-                            <p><strong>Due Date:</strong> {job.due_date}</p>
+                            <p>
+                                <strong>Due Date:</strong> {editingDueDate ? (
+                                    <span className="ms-2">
+                                        <input
+                                            type="text"
+                                            className="form-control form-control-sm d-inline-block"
+                                            style={{width: '180px'}}
+                                            value={newDueDate}
+                                            onChange={(e) => setNewDueDate(e.target.value)}
+                                            placeholder="MM/DD/YYYY HH:MM AM/PM"
+                                        />
+                                        <button className="btn btn-success btn-sm ms-1" onClick={updateDueDate}>
+                                            Save
+                                        </button>
+                                        <button className="btn btn-secondary btn-sm ms-1" onClick={() => {
+                                            setEditingDueDate(false);
+                                            setNewDueDate(job.due_date);
+                                        }}>
+                                            Cancel
+                                        </button>
+                                    </span>
+                                ) : (
+                                    <span>
+                                        {' '}{job.due_date}
+                                        <button
+                                            className="btn btn-sm btn-outline-secondary ms-2"
+                                            onClick={() => setEditingDueDate(true)}
+                                        >
+                                            ✏️ Edit
+                                        </button>
+                                    </span>
+                                )}
+                            </p>
                             <p>
                                 <a href={job.link} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm">
                                     View RFQ →

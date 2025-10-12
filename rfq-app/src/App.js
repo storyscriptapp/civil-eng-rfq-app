@@ -305,6 +305,41 @@ function App() {
     // Get unique organizations for filter dropdown
     const organizations = [...new Set(rfqs.map(rfq => rfq.organization))].sort();
 
+    // Helper function for due date styling
+    const getDueDateStyle = (dueDateStr) => {
+        if (!dueDateStr || dueDateStr === 'N/A') return {};
+        
+        try {
+            // Clean up the date string
+            let cleanedDate = dueDateStr
+                .replace(/(\d+)(st|nd|rd|th)/g, '$1')
+                .replace(/\s+MST|\s+PST|\s+EST|\s+CST/gi, '')
+                .trim();
+            
+            const dueDate = new Date(cleanedDate);
+            if (isNaN(dueDate.getTime())) return {};
+            
+            const now = new Date();
+            const diffTime = dueDate - now;
+            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+            
+            if (diffDays < 0) {
+                // Past due
+                return { color: 'red', fontWeight: 'bold' };
+            } else if (diffDays <= 7) {
+                // Within 1 week
+                return { color: 'darkorange', fontWeight: 'bold' };
+            } else if (diffDays <= 14) {
+                // Within 2 weeks
+                return { color: 'orange' };
+            }
+            
+            return {}; // Normal
+        } catch {
+            return {};
+        }
+    };
+
     // Navigation handlers
     const handleCitySelect = (cityName) => {
         setSelectedCity(cityName);
@@ -606,7 +641,7 @@ function App() {
                                                     <option value="Unknown">Unknown</option>
                                                 </select>
                                             </td>
-                            <td>{rfq.due_date}</td>
+                            <td style={getDueDateStyle(rfq.due_date)}>{rfq.due_date}</td>
                                             <td>
                                                 <div className="btn-group btn-group-sm" role="group">
                                                     <button 
